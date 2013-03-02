@@ -255,12 +255,12 @@ function createAxle(length, direction) {
         return CGM.setRGBA(thisAxle, 20,20,20,255);
         break;
     case LEGO_AXLE_LEFT:
-        thisAxle = CGM.translate(CGM.rotate(thisAxle, origin, cv(1,0,0), Math.PI/2), 7.9, 7.9, axleHeight());
+        thisAxle = CGM.translate(CGM.rotate(thisAxle, origin, cv(1,0,0), -Math.PI/2), 0, 7.9, axleHeight());
         axleCache["left" + length] = thisAxle
         return CGM.Property.setRGBA(CGM.clone(axleCache["left" + length]), 20,20,20,255);
         break;
     default:
-        thisAxle = CGM.translate(CGM.rotate(thisAxle, origin, cv(0,1,0), Math.PI/2), 7.9, 7.9,  axleHeight());
+        thisAxle = CGM.translate(CGM.rotate(thisAxle, origin, cv(0,1,0), -Math.PI/2), 7.9, 0, axleHeight());
         axleCache["front" + length] = thisAxle
         return CGM.Property.setRGBA(CGM.clone(axleCache["left" + length]), 20,20,20,255);
     }
@@ -384,11 +384,13 @@ function lego_cleanup() {
 }
 
 var myAxl = createAxle(20, LEGO_AXLE_LEFT)
-createBeamAt(16,1,LEGO_YELLOW, 0,0,0);
-createBeamAt(12,1,LEGO_YELLOW, 0,0,blockHeight(1));
-createBeamAt(10,1,LEGO_YELLOW, 0,0,blockHeight(2));
-createBeamAt(8,1,LEGO_YELLOW, 0,0,blockHeight(3));
-createBeamAt(6,1,LEGO_YELLOW, 0,0,blockHeight(4));
-createBeamAt(4,1,LEGO_YELLOW, 0,0,blockHeight(5));
-createBeamAt(2,1,LEGO_YELLOW, 0,0,blockHeight(6));
+allPieces.push(myAxl)
+allPieces.push(createBeamAt(16,1,LEGO_YELLOW, 0,0,0))
+allPieces.push(createBeamAt(12,1,LEGO_YELLOW, 0,0,blockHeight(1)))
+allPieces.push(createBeamAt(10,1,LEGO_YELLOW, 0,0,blockHeight(2)))
+allPieces.push(createBeamAt(8,1,LEGO_YELLOW, 0,0,blockHeight(3)))
+allPieces.push(createBeamAt(6,1,LEGO_YELLOW, 0,0,blockHeight(4)))
+allPieces.push(createBeamAt(4,1,LEGO_YELLOW, 0,0,blockHeight(5)))
+allPieces.push(createBeamAt(2,1,LEGO_YELLOW, 0,0,blockHeight(6)))
+createBeamAt(2,1,LEGO_YELLOW, 0, dotWidth(19), 0);
 lego_cleanup();
