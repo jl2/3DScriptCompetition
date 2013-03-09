@@ -9,6 +9,26 @@ cp = CGM.createPoint
 cv = CGM.createVector
 
 var origin = cp(0,0,0)
+
+// The cache for previously created plates
+// This could be made smarter by, for example, recognizing a 4x1 block is just a rotated 1x4 block
+
+var brickCache = new Object()
+brickCache['plates'] = new Object()
+brickCache['techplates'] = new Object()
+brickCache['blocks'] = new Object()
+brickCache['techbeams'] = new Object()
+brickCache['axles'] = new Object()
+brickCache['bigtire'] = new Object()
+brickCache['smalltire'] = new Object()
+
+brickCache['fancyplates'] = new Object()
+brickCache['fancytechplates'] = new Object()
+brickCache['fancyblocks'] = new Object()
+
+var allPieces = new Array();
+var helpers = new Array()
+
 // Useful vectors
 var up = cv(0,0,1);
 var left = cv(0,1,0);
@@ -43,62 +63,123 @@ var LEGO_GREEN = 2
 var LEGO_BLUE = 3
 var LEGO_YELLOW = 4
 var LEGO_WHITE = 5
-var LEGO_COLORS = [[0,0,0],
-                   [255,0,0],
-                   [0,255,0],
-                   [0,0,255],
-                   [255,255,0],
-                   [255,255,255]];
+var LEGO_COLORS = [App.Color.createRGB(0,0,0),
+                   App.Color.createRGB(255,0,0),
+                   App.Color.createRGB(0,255,0),
+                   App.Color.createRGB(0,0,255),
+                   App.Color.createRGB(255,255,0),
+                   App.Color.createRGB(255,255,255)];
 
-var helpers = new Array()
-// This is cloned because it may be faster than creating multiple cylinders
+// The knob on top of regular bricks, plates, tech plates, etc
+// The fancyknob on top of regular bricks, plates, tech plates, etc
+var fancyknob = CGM.createCylinder(cp((P-0.2)/2, (P-0.2)/2, 0), up, 1.8, 2.4)
+fancyknob = CGM.fillet(CGM.getEdges(fancyknob)[2], 0.25)
+
+var lblock = CGM.createCuboid(cp(0,0,0), cp(0.25,1.5,0.1))
+lblock = CGM.unite(lblock, CGM.createCuboid(cp(0,0,0), cp(0.8,0.25,0.1)))
+lblock = CGM.translate(lblock, (P-0.2)/2-2*4.8/5, (P-0.2)/2-4.8/6, 1.75)
+lblock = CGM.fillet(CGM.getEdges(lblock), 0.05)
+fancyknob = CGM.unite(fancyknob, lblock)
+
+var eblock = CGM.fillet(CGM.getEdges(CGM.createCuboid(cp(1.0,0, 0), cp(1.25,1.5, 0.1))), 0.05)
+eblock = CGM.unite(eblock, CGM.fillet(CGM.getEdges(CGM.createCuboid(cp(1.0,0, 0), cp(1.8,0.3, 0.1))), 0.05))
+eblock = CGM.unite(eblock, CGM.fillet(CGM.getEdges(CGM.createCuboid(cp(1.0,0.6, 0), cp(1.8,0.9, 0.1))), 0.05))
+eblock = CGM.unite(eblock, CGM.fillet(CGM.getEdges(CGM.createCuboid(cp(1.0,1.2, 0), cp(1.8,1.5, 0.1))), 0.05))
+eblock = CGM.translate(eblock, (P-0.2)/2-2*4.8/5, (P-0.2)/2-4.8/6, 1.75)
+fancyknob = CGM.unite(fancyknob, eblock)
+
+var gblock = CGM.fillet(CGM.getEdges(CGM.createCuboid(cp(2.0,0,0), cp(2.25,1.5,0.1))), 0.05)
+gblock = CGM.unite(gblock, CGM.fillet(CGM.getEdges(CGM.createCuboid(cp(2.0,1.2,0), cp(2.8,1.5,0.1))), 0.05))
+gblock = CGM.unite(gblock, CGM.fillet(CGM.getEdges(CGM.createCuboid(cp(2.0,0,0), cp(2.8,0.3,0.1))), 0.05))
+gblock = CGM.unite(gblock, CGM.fillet(CGM.getEdges(CGM.createCuboid(cp(2.6,0,0), cp(2.8,0.8,0.1))), 0.05))
+gblock = CGM.unite(gblock, CGM.fillet(CGM.getEdges(CGM.createCuboid(cp(2.5,0.6,0), cp(2.8,0.8,0.1))), 0.05))
+gblock = CGM.translate(gblock, (P-0.2)/2-2*4.8/5, (P-0.2)/2-4.8/6, 1.75)
+fancyknob = CGM.unite(fancyknob, gblock)
+
+var oblock = CGM.createCuboid(cp(2.9,0,0), cp(3.7, 1.5, 0.1))
+oblock = CGM.subtract(oblock, CGM.createCuboid(cp(3.2,0.3,0), cp(3.4, 1.2, 0.1)))
+oblock = CGM.fillet(CGM.getEdges(oblock), 0.05)
+oblock = CGM.translate(oblock, (P-0.2)/2-2*4.8/5, (P-0.2)/2-4.8/6, 1.75)
+fancyknob = CGM.unite(fancyknob, oblock)
+helpers.push(fancyknob)
+
 var knob = CGM.createCylinder(cp((P-0.2)/2, (P-0.2)/2, 0), up, 1.8, 2.4)
 knob = CGM.fillet(CGM.getEdges(knob)[2], 0.25)
 helpers.push(knob)
 
+// Technic knob
 var techKnob = CGM.createCylinder(cp((P-0.2)/2, (P-0.2)/2, 0), up, 1.8, 2.4)
 techKnob = CGM.subtract(techKnob, CGM.createCylinder(cp((P-0.2)/2, (P-0.2)/2, 0.8), up, 1.0, 3.0/2))
-techKnob = CGM.fillet(CGM.getEdges(techKnob)[2], 0.25)
-techKnob = CGM.fillet(CGM.getEdges(techKnob)[4], 0.25)
+techKnob = CGM.fillet(CGM.getEdges(techKnob)[2], 0.125)
+techKnob = CGM.fillet(CGM.getEdges(techKnob)[4], 0.125)
 helpers.push(techKnob)
 
+// The hole in 1xN beams
 var techHoleLeft = CGM.createCylinder(cp(7.9,0,5.6), left, 7.8, 4.8/2)
 techHoleLeft = CGM.unite(techHoleLeft, CGM.createCylinder(cp(7.9,0,5.6), left, 1.5, 6.2/2))
 techHoleLeft = CGM.unite(techHoleLeft, CGM.createCylinder(cp(7.9,7.8-1.5,5.6), left, 1.5, 6.2/2))
 helpers.push(techHoleLeft)
 
+// The hole in Nx1 beams - don't know why I don't rotate the one above...
 var techHoleFront = CGM.createCylinder(cp(0,7.9,5.6), front, 7.8, 4.8/2)
 techHoleFront = CGM.unite(techHoleFront, CGM.createCylinder(cp(0,7.9,5.6), front, 1.5, 6.2/2))
 techHoleFront = CGM.unite(techHoleFront, CGM.createCylinder(cp(7.8-1.5,7.9,5.6), front, 1.5, 6.2/2))
 helpers.push(techHoleFront)
 
-var techUnderCylinder = CGM.createCylinder(cp(0,0,0), up, 9.6, 3.0/2)
-helpers.push(techUnderCylinder)
+// The small cylinder in technic beams - not used yet
+var techUnderCylinderLeft = CGM.createCylinder(cp(7.9,0,5.6), left, dotWidth(1), 6.2/2)
+techUnderCylinderLeft = CGM.unite(techUnderCylinderLeft, CGM.createCylinder(cp(7.9, dotWidth(1)/2, 0), up, 9.6, 3.0/2))
+helpers.push(techUnderCylinderLeft)
 
+var techUnderCylinderFront = CGM.createCylinder(cp(7.9,0,5.6), front, dotWidth(1), 6.2/2)
+techUnderCylinderFront = CGM.unite(techUnderCylinderFront, CGM.createCylinder(cp(7.9, dotWidth(1)/2, 0), up, 9.6, 3.0/2))
+helpers.push(techUnderCylinderFront)
+
+// The hollow cylinder under regular bricks
 var blockUnderCylinder = CGM.createCylinder(cp(8,8,0), up, 8.6, 6.51/2)
 blockUnderCylinder = CGM.subtract(blockUnderCylinder, CGM.createCylinder(cp(8,8,0), up, 8.6, 4.8/2))
 helpers.push(blockUnderCylinder)
 
+// The short hollow cylinder under plates
 var plateUnderCylinder = CGM.createCylinder(cp(8,8,0), up, 2.2, 6.51/2)
 plateUnderCylinder = CGM.subtract(plateUnderCylinder, CGM.createCylinder(cp(8,8,0), up, 2.2, 4.8/2))
 helpers.push(plateUnderCylinder)
 
+// The hole in technic plates
+var techPlateHole = CGM.createCylinder(cp(8,8,2), up, 2, 4.8/2)
+helpers.push(techPlateHole)
+// The small hole under knobs for blocks and plates
 var smallHole = CGM.createCylinder(cp((P-0.2)/2, (P-0.2)/2, -1), up, 1.0, 2.6/2)
 helpers.push(smallHole)
 
-// The cache for previously created plates
-// This could be made smarter by recognizing a 4x1 block is just a rotated 1x4 block
-var plateCache = new Object()
+var rad = 4.8/2
+var thirdDiam = 4.8/5
+var len2 = dotWidth(2)
+
+// subAxle is used to create axle shaped holes in gears, tires, and other places
+var subAxle = CGM.createCylinder(cp(0,0,0), up, len2, rad)
+subAxle = CGM.subtract(subAxle, CGM.createCuboid(cp(-rad, -rad, 0), cp(-thirdDiam, -thirdDiam, len2)))
+subAxle = CGM.subtract(subAxle, CGM.createCuboid(cp(thirdDiam, thirdDiam, 0), cp(rad, rad, len2)))
+subAxle = CGM.subtract(subAxle, CGM.createCuboid(cp(-rad, thirdDiam, 0), cp(-thirdDiam, rad, len2)))
+subAxle = CGM.subtract(subAxle, CGM.createCuboid(cp(thirdDiam, -rad, 0), cp(rad, -thirdDiam, len2)))
+subAxle = CGM.fillet(CGM.getEdges(subAxle), 0.5)
+subAxle = CGM.rotate(subAxle, origin, cv(1,0,0), -Math.PI/2);
+helpers.push(subAxle);
 
 // Create a plate of the given size and color
-function createPlate(width, height, color) {
+function createPlate(width, height, color, fancy) {
     // Check the cache
     var descString = "" + width + "x" + height
-    if (plateCache[descString]) {
+    var cachename = "plates"
+    if (fancy) {
+        cachename = "fancy" + cachename;
+    }
+    if (brickCache[cachename][descString]) {
         // It was in the cache, so set the color and return it
-        var cc = LEGO_COLORS[color];
-        var tmp = CGM.clone(plateCache[descString]);
-        return CGM.Property.setRGBA(tmp, cc[0], cc[1], cc[2], 255)
+        var tmp = CGM.clone(brickCache[cachename][descString]);
+        tmp = CGM.Property.setColor(tmp, LEGO_COLORS[color])
+        allPieces.push(tmp)
+        return tmp
     }
     // It wasn't in the cache, so create it
     var trans = new Array()
@@ -108,7 +189,12 @@ function createPlate(width, height, color) {
             trans.push(CGM.createTranslation(cpi * 8, cpj * 8, h));
         }
     }
-    var thisKnob = CGM.clone(knob);
+    var thisKnob;
+    if (fancy) {
+        thisKnob = CGM.clone(fancyknob);
+    } else {
+        thisKnob = CGM.clone(knob);
+    }
     blockSoFar = CGM.unite(blockSoFar, CGM.applyPatternToFeature(CGM.getFaces(thisKnob), trans));
     blockSoFar = CGM.subtract(blockSoFar, CGM.clone(knob))
 
@@ -127,24 +213,87 @@ function createPlate(width, height, color) {
     blockSoFar = CGM.unite(blockSoFar, CGM.applyPatternToFeature(CGM.getFaces(thisCyl), trans));
     // CGM.Part.remove(thisCyl)
     // Add it to the cache
-    plateCache[descString] = blockSoFar;
+    brickCache[cachename][descString] = blockSoFar;
 
     // Set the color and return it
-    var tmp = CGM.clone(plateCache[descString]);
-    var cc = LEGO_COLORS[color];
-    return CGM.Property.setRGBA(tmp, cc[0], cc[1], cc[2], 255)
+    var tmp = CGM.clone(brickCache[cachename][descString]);
+    tmp = CGM.Property.setColor(tmp, LEGO_COLORS[color])
+    allPieces.push(tmp)
+    return tmp
+}
+
+function createTechnicPlate(width, height, color, fancy) {
+    var cachename = "techplates"
+    if (fancy) {
+        cachename = "fancy" + cachename;
+    }
+    // Check the cache
+    var descString = "" + width + "x" + height
+    if (brickCache[cachename][descString]) {
+        // It was in the cache, so set the color and return it
+        var tmp = CGM.clone(brickCache[cachename][descString]);
+        tmp = CGM.Property.setColor(tmp, LEGO_COLORS[color])
+        allPieces.push(tmp)
+        return tmp
+    }
+    // It wasn't in the cache, so create it
+    var trans = new Array()
+    var blockSoFar = CGM.createCuboid(0,0,0,width*P-0.2,height*P-0.2,h)
+    for (var cpi = 0; cpi<width; ++cpi) {
+        for (var cpj = 0; cpj<height; ++cpj) {
+            trans.push(CGM.createTranslation(cpi * 8, cpj * 8, h));
+        }
+    }
+    
+    var thisKnob;
+    if (fancy) {
+        thisKnob = CGM.clone(fancyknob);
+    } else {
+        thisKnob = CGM.clone(knob);
+    }
+    blockSoFar = CGM.unite(blockSoFar, CGM.applyPatternToFeature(CGM.getFaces(thisKnob), trans));
+    blockSoFar = CGM.subtract(blockSoFar, CGM.clone(knob))
+
+    blockSoFar = CGM.subtract(blockSoFar, CGM.createCuboid(1.2,1.2,0, width*P-1.4,height*P-1.4,h - 1.0))
+
+    var thisHole = CGM.clone(smallHole)
+    blockSoFar = CGM.subtract(blockSoFar, CGM.applyPatternToFeature(CGM.getFaces(thisHole), trans));
+
+    trans = new Array()
+    for (var uci = 0; uci<width-1; ++uci) {
+        for (var ucj = 0; ucj<height-1; ++ucj) {
+            trans.push(CGM.createTranslation(uci * 8, ucj * 8, 0));
+        }
+    }
+    var thisCyl = CGM.clone(plateUnderCylinder);
+    blockSoFar = CGM.unite(blockSoFar, CGM.applyPatternToFeature(CGM.getFaces(thisCyl), trans));
+    var thisPlateHole = CGM.clone(techPlateHole);
+    blockSoFar = CGM.subtract(blockSoFar, CGM.applyPatternToFeature(CGM.getFaces(thisPlateHole), trans));
+    // CGM.Part.remove(thisCyl)
+    // Add it to the cache
+    brickCache[cachename][descString] = blockSoFar;
+
+    // Set the color and return it
+    var tmp = CGM.clone(brickCache[cachename][descString]);
+    tmp = CGM.Property.setColor(tmp, LEGO_COLORS[color])
+    allPieces.push(tmp)
+    return tmp
 }
 
 // The block cache
-var blockCache = new Object()
-function createBlock(width, height, color) {
+function createBlock(width, height, color, fancy) {
+    var cachename = "blocks"
+    if (fancy) {
+        cachename = "fancy" + cachename;
+    }
     // Check the cache
     var descString = "" + width + "x" + height
-    if (blockCache[descString]) {
+    if (brickCache[cachename][descString]) {
         // It was 
-        var cc = LEGO_COLORS[color];
-        var tmp = CGM.clone(blockCache[descString]);
-        return CGM.Property.setRGBA(tmp, cc[0], cc[1], cc[2], 255)
+        var tmp = CGM.clone(brickCache[cachename][descString]);
+        tmp = CGM.Property.setColor(tmp, LEGO_COLORS[color])
+        allPieces.push(tmp)
+        return tmp
     }
     var trans = new Array()
     var blockSoFar = CGM.createCuboid(0,0,0,width*P-0.2,height*P-0.2,3*h)
@@ -155,7 +304,12 @@ function createBlock(width, height, color) {
             trans.push(CGM.createTranslation( cpi * 8,  cpj * 8, 3*h));
         }
     }
-    var thisKnob = CGM.clone(knob);
+    var thisKnob;
+    if (fancy) {
+        thisKnob = CGM.clone(fancyknob);
+    } else {
+        thisKnob = CGM.clone(knob);
+    }
     blockSoFar = CGM.unite(blockSoFar, CGM.applyPatternToFeature(CGM.getFaces(thisKnob), trans));
     blockSoFar = CGM.subtract(blockSoFar, CGM.clone(knob))
 
@@ -171,29 +325,34 @@ function createBlock(width, height, color) {
     var thisCyl = CGM.clone(blockUnderCylinder);
     blockSoFar = CGM.unite(blockSoFar, CGM.applyPatternToFeature(CGM.getFaces(thisCyl), trans));
     
-    blockCache[descString] = blockSoFar;
+    brickCache[cachename][descString] = blockSoFar;
     
-    var tmp = CGM.clone(blockCache[descString]);
-    var cc = LEGO_COLORS[color];
-    return CGM.Property.setRGBA(tmp, cc[0], cc[1], cc[2], 255)
+    var tmp = CGM.clone(brickCache[cachename][descString]);
+    tmp = CGM.Property.setColor(tmp, LEGO_COLORS[color])
+    allPieces.push(tmp)
+    return tmp
 }
 
-var techBeamCache = new Object()
-function createTechnicBeam(width, height, color) {
+function createTechnicBeam(width, height, color, fancy) {
     // if (((width!=1 && height<2)) || ((height != 1) && width<2)) {
     //     return;
     // }
     // Check the cache
     var descString = "" + width + "x" + height
-    if (techBeamCache[descString]) {
+    if (brickCache['techbeams'][descString]) {
         // It was 
         var cc = LEGO_COLORS[color];
-        var tmp = CGM.clone(techBeamCache[descString]);
-        return CGM.Property.setRGBA(tmp, cc[0], cc[1], cc[2], 255)
+        var tmp = CGM.clone(brickCache['techbeams'][descString]);
+        tmp = CGM.Property.setColor(tmp, LEGO_COLORS[color])
+        allPieces.push(tmp)
+        return tmp
+
     }
     var trans = new Array()
     var blockSoFar = CGM.createCuboid(0,0,0,width*P-0.2,height*P-0.2,3*h)
+    blockSoFar = CGM.subtract(blockSoFar, CGM.createCuboid(1.2,1.2,0, width*P-1.4,height*P-1.4,3*h - 1.0))
 
+    
     for (var cpi = 0; cpi<width; ++cpi) {
         for (var cpj = 0; cpj<height; ++cpj) {
             trans.push(CGM.createTranslation( cpi * 8,  cpj * 8, 3*h));
@@ -201,12 +360,16 @@ function createTechnicBeam(width, height, color) {
     }
     var thisKnob = CGM.clone(techKnob);
     blockSoFar = CGM.unite(blockSoFar, CGM.applyPatternToFeature(CGM.getFaces(thisKnob), trans));
+    
 
     trans = new Array()
     if (width == 1) {
         for (var hi = 0;hi<height-1; ++hi) {
             trans.push(CGM.createTranslation(0, hi*8, 0));
         }
+        var thisHoleBase = CGM.clone(techUnderCylinderFront);
+        blockSoFar = CGM.unite(blockSoFar, CGM.applyPatternToFeature(CGM.getFaces(thisHoleBase), trans))
+
         var thisHole = CGM.clone(techHoleFront);
         blockSoFar = CGM.subtract(blockSoFar, CGM.applyPatternToFeature(CGM.getFaces(thisHole), trans))
     } else if (height == 1) {
@@ -214,27 +377,32 @@ function createTechnicBeam(width, height, color) {
             trans.push(CGM.createTranslation(wi*8, 0, 0));
             ;
         }
+        var thisHoleBase = CGM.clone(techUnderCylinderLeft);
+        blockSoFar = CGM.unite(blockSoFar, CGM.applyPatternToFeature(CGM.getFaces(thisHoleBase), trans))
+        
         var thisHole = CGM.clone(techHoleLeft);
         blockSoFar = CGM.subtract(blockSoFar, CGM.applyPatternToFeature(CGM.getFaces(thisHole), trans))
     }
     
-    techBeamCache[descString] = blockSoFar;
+    brickCache['techbeams'][descString] = blockSoFar;
     
-    var tmp = CGM.clone(techBeamCache[descString]);
-    var cc = LEGO_COLORS[color];
-    return CGM.Property.setRGBA(tmp, cc[0], cc[1], cc[2], 255)
+    var tmp = CGM.clone(brickCache['techbeams'][descString]);
+    tmp = CGM.Property.setColor(tmp, LEGO_COLORS[color])
+    allPieces.push(tmp)
+    return tmp
 }
 
-var axleCache = new Object();
 var axleDescs = ["up", "left", "front"]
 function createAxle(length, direction) {
     var rad = 4.8/2
     var thirdDiam = 4.8/5
-    var thisLen = length * dotWidth(1)
+    var thisLen = dotWidth(length)
     
     var descString = axleDescs[direction] + length;
-    if (axleCache[descString]) {
-        return CGM.Property.setRGBA(CGM.clone(axleCache[descString]), 20,20,20,255);
+    if (brickCache['axles'][descString]) {
+        tmp = CGM.Property.setRGBA(CGM.clone(brickCache['axles'][descString]), 20,20,20,255);
+        allPieces.push(tmp)
+        return tmp
     }
     var thisAxle = CGM.createCylinder(cp(0,0,0), up, thisLen, 4.8/2)
     var sub1 = CGM.createCuboid(cp(-rad, -rad, 0), cp(-thirdDiam, -thirdDiam, thisLen))
@@ -248,44 +416,182 @@ function createAxle(length, direction) {
     thisAxle = CGM.subtract(thisAxle, sub4)
 
     thisAxle = CGM.fillet(CGM.getEdges(thisAxle), 0.5)
-    axleCache["up" + length] = thisAxle
-    thisAxle = CGM.clone(axleCache["up" + length]);
+    brickCache['axles']["up" + length] = thisAxle
+    thisAxle = CGM.clone(brickCache['axles']["up" + length]);
+    var tmp;
     switch (direction) {
     case LEGO_AXLE_UP:
-        return CGM.setRGBA(thisAxle, 20,20,20,255);
+        tmp = CGM.setRGBA(thisAxle, 20,20,20,255)
+        allPieces.push(tmp)
+        return tmp
         break;
     case LEGO_AXLE_LEFT:
         thisAxle = CGM.translate(CGM.rotate(thisAxle, origin, cv(1,0,0), -Math.PI/2), 7.9, 0, axleHeight());
-        axleCache["left" + length] = thisAxle
-        return CGM.Property.setRGBA(CGM.clone(axleCache["left" + length]), 20,20,20,255);
+        brickCache['axles']["left" + length] = thisAxle
+        tmp = CGM.Property.setRGBA(CGM.clone(brickCache['axles']["left" + length]), 20,20,20,255);
+        allPieces.push(tmp)
+        return tmp
         break;
     default:
         thisAxle = CGM.translate(CGM.rotate(thisAxle, origin, cv(0,1,0), -Math.PI/2), 0, 7.9, axleHeight());
-        axleCache["front" + length] = thisAxle
-        return CGM.Property.setRGBA(CGM.clone(axleCache["left" + length]), 20,20,20,255);
+        brickCache['axles']["front" + length] = thisAxle
+        tmp = CGM.Property.setRGBA(CGM.clone(brickCache['axles']["left" + length]), 20,20,20,255);
+        allPieces.push(tmp)
+        return 
     }
     return;
 }
 
 function createSmallGear() {
+    
 }
-// -rad, -rad, 0
-// -thirdDiam, -thirdDiam, thisLen
-// /*
-//   +--+--+--+--+
-//   |  |  |  |  |
-//   +--+--+--+--+
-//   |  |  |  |  |
-//   +--+--+--+--+
-//   |  |  |  |  |
-//   +--+--+--+--+
-//   |  |  |  |  |
-// */
 
-function createBlockAt(width, height, color, x,y,z) {
-    var tmp = createBlock(width, height, color);
+function createBigGearAt(direction, x,y,z) {
+    var gear = CGM.createCylinder(cp(0,0,0), up, dotWidth(1)*0.75, axleHeight())
+    gear = CGM.translate(gear, x,y,z)
+    allPieces.push(gear)
+    return gear
+}
+
+function createSmallTireAt(x,y,z, normal) {
+    var tire;
+    var rim;
+    if (brickCache["smalltire"]["rim"]) {
+        tire = CGM.clone(brickCache["smalltire"]["tire"])
+        rim = CGM.clone(brickCache["smalltire"]["rim"])
+    } else {
+
+        tire = CGM.createCylinder(cp(0,0,0), left, dotWidth(1), dotWidth(3)/2)
+        tire = CGM.subtract(tire, CGM.createCylinder(cp(0,0,0), left, dotWidth(1), dotWidth(2.8)/3))
+        for (var i = 0; i<60; ++i) {
+            var thisBlock = CGM.createCuboid(0,0,dotWidth(2.8)/2, dotWidth(0.2), 0.5*dotWidth(1), dotWidth(3.1)/2)
+            if (i%2 ==0) {
+                thisBlock = CGM.translate(thisBlock, 0, dotWidth(1)/2, 0)
+            }
+            thisBlock = CGM.rotate(thisBlock, cp(0,0,0), left, i * ((2*Math.PI)/60))
+            thisBlock = CGM.fillet([CGM.getEdges(thisBlock)[2] ], 0.5)
+            tire = CGM.unite(tire, thisBlock)
+        }
+
+        rim = CGM.createCylinder(cp(0,0,0), left, dotWidth(1), dotWidth(3)/3)
+        rim = CGM.subtract(rim, CGM.clone(subAxle))
+        rim = CGM.fillet(CGM.getEdges(rim), 0.5)
+        brickCache["smalltire"]["tire"] = tire
+        brickCache["smalltire"]["rim"] = rim
+        tire = CGM.clone(brickCache["smalltire"]["tire"])
+        rim = CGM.clone(brickCache["smalltire"]["rim"])
+        
+    }
+    if (normal == LEGO_AXLE_UP) {
+        rim = CGM.rotate(rim, cp(0,0,0), cv(1,0,0), -Math.PI/2)
+        tire = CGM.rotate(tire, cp(0,0,0), cv(1,0,0), -Math.PI/2)
+    } else if (normal == -LEGO_AXLE_UP) {
+        rim = CGM.rotate(rim, cp(0,0,0), cv(1,0,0), Math.PI/2)
+        tire = CGM.rotate(tire, cp(0,0,0), cv(1,0,0), Math.PI/2)
+    } else if (normal == LEGO_AXLE_LEFT) {
+        ;
+    } else if (normal == -LEGO_AXLE_LEFT) {
+        rim = CGM.rotate(rim, cp(0,0,0), cv(0,0,1), -Math.PI)
+        tire = CGM.rotate(tire, cp(0,0,0), cv(0,0,1), -Math.PI)
+    } else if (normal == LEGO_AXLE_FRONT) {
+        rim = CGM.rotate(rim, cp(0,0,0), cv(0,0,1), Math.PI/2)
+        tire = CGM.rotate(tire, cp(0,0,0), cv(0,0,1), Math.PI/2)
+        
+    } else if (normal == -LEGO_AXLE_FRONT) {
+        rim = CGM.rotate(rim, cp(0,0,0), cv(0,0,1), -Math.PI/2)
+        tire = CGM.rotate(tire, cp(0,0,0), cv(0,0,1), -Math.PI/2)
+    }
+
+    rim = CGM.translate(CGM.Property.setRGBA(rim, 255,255,255,255), x,y,z)
+    
+    tire = CGM.translate(CGM.Property.setRGBA(tire, 20,20,20,255), x,y,z)
+    allPieces.push(rim)
+    allPieces.push(tire)
+    return [rim, tire]
+}
+
+function createBigTireAt(x,y,z, normal) {
+    var tire;
+    var rim;
+    if (brickCache["bigtire"]["rim"]) {
+        tire = CGM.clone(brickCache["bigtire"]["tire"])
+        rim = CGM.clone(brickCache["bigtire"]["rim"])
+    } else {
+        tire = CGM.createCylinder(cp(0,0,0), left, dotWidth(2), dotWidth(5.8)/2)
+        tire = CGM.subtract(tire, CGM.createCylinder(cp(0,0,0), left, dotWidth(2), dotWidth(6)/3))
+        tire = CGM.fillet(CGM.getEdges(tire), 0.5)
+
+        for (var i = 0; i<60; ++i) {
+            var thisBlock = CGM.createCuboid(0,0,dotWidth(5.8)/2, dotWidth(0.4), dotWidth(1), dotWidth(6)/2)
+            if (i%2 ==0) {
+                thisBlock = CGM.translate(thisBlock, 0, dotWidth(1), 0)
+            }
+            thisBlock = CGM.rotate(thisBlock, cp(0,0,0), left, i * ((2*Math.PI)/60))
+            thisBlock = CGM.fillet([CGM.getEdges(thisBlock)[2] ], 0.5)
+            tire = CGM.unite(tire, thisBlock)
+        }
+
+        rim = CGM.createCylinder(cp(0,0,0), left, dotWidth(2), dotWidth(6)/3)
+        rim = CGM.subtract(rim, CGM.createCylinder(cp(0,dotWidth(0.5),0), left, dotWidth(2), dotWidth(6)/3.5))
+
+        rim = CGM.subtract(rim, CGM.createCylinder(cp(0,0,0), left, dotWidth(2), 4.8/2))
+
+        for (var i = 0; i<6;++i) {
+            var thisHole = CGM.createCylinder(cp(0,0,0), left, dotWidth(2), 4.8/2)
+            thisHole = CGM.translate(thisHole, dotWidth(1), 0,0)
+            thisHole = CGM.rotate(thisHole, cp(0,0,0), left, i * Math.PI/3)
+            rim = CGM.subtract(rim, thisHole)
+        }
+        rim = CGM.fillet(CGM.getEdges(rim), 0.5)
+        brickCache["bigtire"]["tire"] = tire
+        brickCache["bigtire"]["rim"] = rim
+        tire = CGM.clone(brickCache["bigtire"]["tire"])
+        rim = CGM.clone(brickCache["bigtire"]["rim"])
+    }
+
+    if (normal == LEGO_AXLE_UP) {
+        rim = CGM.rotate(rim, cp(0,0,0), cv(1,0,0), -Math.PI/2)
+        tire = CGM.rotate(tire, cp(0,0,0), cv(1,0,0), -Math.PI/2)
+    } else if (normal == -LEGO_AXLE_UP) {
+        rim = CGM.rotate(rim, cp(0,0,0), cv(1,0,0), Math.PI/2)
+        tire = CGM.rotate(tire, cp(0,0,0), cv(1,0,0), Math.PI/2)
+    } else if (normal == LEGO_AXLE_LEFT) {
+        ;
+    } else if (normal == -LEGO_AXLE_LEFT) {
+        rim = CGM.rotate(rim, cp(0,0,0), cv(0,0,1), -Math.PI)
+        tire = CGM.rotate(tire, cp(0,0,0), cv(0,0,1), -Math.PI)
+    } else if (normal == LEGO_AXLE_FRONT) {
+        rim = CGM.rotate(rim, cp(0,0,0), cv(0,0,1), Math.PI/2)
+        tire = CGM.rotate(tire, cp(0,0,0), cv(0,0,1), Math.PI/2)
+        
+    } else if (normal == -LEGO_AXLE_FRONT) {
+        rim = CGM.rotate(rim, cp(0,0,0), cv(0,0,1), -Math.PI/2)
+        tire = CGM.rotate(tire, cp(0,0,0), cv(0,0,1), -Math.PI/2)
+    }
+
+    rim = CGM.translate(CGM.Property.setRGBA(rim, 255,255,255,255), x,y,z)
+    
+    tire = CGM.translate(CGM.Property.setRGBA(tire, 20,20,20,255), x,y,z)
+    allPieces.push(rim)
+    allPieces.push(tire)
+    return [rim, tire]
+}
+
+function createPulleyAt(x,y,z) {
+    
+}
+
+function createConnectorAt(x,y,z) {
+}
+
+function createSmallConnectorAt(x,y,z) {
+}
+
+function createBlockAt(width, height, color, x,y,z, fancy) {
+    var tmp = createBlock(width, height, color, fancy);
     return CGM.translate(tmp, x,y,z);
 }
+
 function createBeamAt(width, height, color, x,y,z) {
     var tmp = createTechnicBeam(width, height, color)
     return CGM.translate(tmp, x,y,z);
@@ -294,13 +600,22 @@ function randomColor() {
     return Math.floor(Math.random()*(LEGO_WHITE+1))
 }
 
-
-function createPlateAt(width, height, color, x,y,z) {
-    var tmp = createPlate(width, height, color);
+function createPlateAt(width, height, color, x,y,z, fancy) {
+    var tmp = createPlate(width, height, color, fancy);
     return CGM.translate(tmp, x,y,z);
 }
 
-var allPieces = new Array();
+function createTechPlateAt(width, height, color, x,y,z, fancy) {
+    var tmp = createTechnicPlate(width, height, color, fancy);
+    return CGM.translate(tmp, x,y,z);
+}
+
+function createAxleAt(length, direction, x,y,z) {
+    var tmp = createAxle(length, direction)
+    return CGM.translate(tmp, x,y,z)
+}
+
+
 function createTowerAt(levels, xp,yp, zp) {
     for (var li = 0; li<levels; ++li) {
         var curHeight = (blockHeight(li));
@@ -310,31 +625,24 @@ function createTowerAt(levels, xp,yp, zp) {
         if (0 == (li % 2)) {
             if (Math.random()>0.5) {
                 var block1 = createBlockAt(4,2, randomColor(), 0+xp,0+yp, curHeight+zp)
-                allPieces.push(block1)
                 if (Math.random()>0.5) {
                     var block2 = createBlockAt(4,2, randomColor(), 0+xp, dotWidth(2)+yp, curHeight+zp)
-                    allPieces.push(block2)
                 }
             } else {
                 var block2 = createBlockAt(4,2, randomColor(), 0+xp, dotWidth(2)+yp, curHeight+zp)
-                allPieces.push(block2)
             }
         } else {
             if (Math.random()>0.5) {
                 var block1 = createBlockAt(2,4, randomColor(), 0+xp, 0+yp, curHeight+zp)
-                allPieces.push(block1)
                 if (Math.random()>0.5) {
                     var block2 = createBlockAt(2,4, randomColor(), dotWidth(2)+xp, 0+yp, curHeight+zp)
-                    allPieces.push(block2)
                 }
             } else {
                 var block2 = createBlockAt(2,4, randomColor(), dotWidth(2)+xp, 0+yp, curHeight+zp)
-                allPieces.push(block2)
             }
         }
     }
 }
-
 
 function createTableAt(width, height, depth, xp, yp, zp) {
     for (var lvl = 0; lvl< depth; ++lvl) {
@@ -343,14 +651,10 @@ function createTableAt(width, height, depth, xp, yp, zp) {
         var b2 = createBlockAt(2,2, randomColor(), dotWidth(width-2)+xp,0+yp, curHeight)
         var b3 = createBlockAt(2,2, randomColor(), 0+xp, dotWidth(height-2)+yp, curHeight)
         var b4 = createBlockAt(2,2, randomColor(), dotWidth(width-2)+xp, dotWidth(height-2)+yp, curHeight)
-        allPieces.push(b1)
-        allPieces.push(b2)
-        allPieces.push(b3)
-        allPieces.push(b4)
     }
     var top = createPlateAt(width, height, randomColor(), 0+xp,0+yp, blockHeight(depth)+zp)
-    allPieces.push(top)
 }
+
 function clearPieces() {
     for (var pc in allPieces) {
         CGM.Part.remove(allPieces[pc])
@@ -359,38 +663,69 @@ function clearPieces() {
 }
 
 function lego_cleanup() {
-    for (var val in blockCache) {
-        CGM.Part.remove(blockCache[val]);
-    }
-    for (var val in plateCache) {
-        CGM.Part.remove(plateCache[val]);
-    }
-    for (var val in techBeamCache) {
-        CGM.Part.remove(techBeamCache[val]);
-    }
-    for (var val in axleCache) {
-        CGM.Part.remove(axleCache[val]);
+    for (var idx in brickCache) {
+        for (var val in brickCache[idx]) {
+            CGM.Part.remove(brickCache[idx][val])
+        }
     }
     for (hlp in helpers) {
         CGM.Part.remove(helpers[hlp])
     }
-    // CGM.Part.remove(knob)
-    // CGM.Part.remove(plateUnderCylinder);
-    // CGM.Part.remove(blockUnderCylinder);
-    // CGM.Part.remove(smallHole);
-    // CGM.Part.remove(techHoleFront);
-    // CGM.Part.remove(techHoleLeft);
-    // CGM.Part.remove(techUnderCylinder);
 }
+function createTower2() {
+    createTableAt(8,8,8, dotWidth(1),dotWidth(1),blockHeight(10) + plateHeight(1))
+    createTableAt(6,6,6, dotWidth(2),dotWidth(2),blockHeight(18) + plateHeight(2))
+    createTableAt(4,4,4, dotWidth(3),dotWidth(3),blockHeight(24) + plateHeight(3))
+    createTowerAt(20, dotWidth(3), dotWidth(3), blockHeight(28))
+}
+// for (var i = 0;i<10; ++i) {
+//     allPieces.push(createBlockAt(2,2, randomColor(), dotWidth(4), dotWidth(4), blockHeight(28+i) + plateHeight(4)))
+// }
 
-var myAxl = createAxle(20, LEGO_AXLE_LEFT)
-allPieces.push(myAxl)
-allPieces.push(createBeamAt(16,1,LEGO_YELLOW, 0,0,0))
-allPieces.push(createBeamAt(12,1,LEGO_YELLOW, 0,0,blockHeight(1)))
-allPieces.push(createBeamAt(10,1,LEGO_YELLOW, 0,0,blockHeight(2)))
-allPieces.push(createBeamAt(8,1,LEGO_YELLOW, 0,0,blockHeight(3)))
-allPieces.push(createBeamAt(6,1,LEGO_YELLOW, 0,0,blockHeight(4)))
-allPieces.push(createBeamAt(4,1,LEGO_YELLOW, 0,0,blockHeight(5)))
-allPieces.push(createBeamAt(2,1,LEGO_YELLOW, 0,0,blockHeight(6)))
-createBeamAt(2,1,LEGO_YELLOW, 0, dotWidth(18), 0);
+function createTruckBase() {
+    createBeamAt(16,1,LEGO_YELLOW, 0,0,0)
+    createBeamAt(16,1,LEGO_YELLOW, 0,dotWidth(7),0)
+
+    createBeamAt(16,1,LEGO_YELLOW, dotWidth(14),dotWidth(1),0)
+    createBeamAt(16,1,LEGO_YELLOW, dotWidth(14),dotWidth(6),0)
+
+    createTechPlateAt(2,8, LEGO_RED, 0,0,blockHeight(1),true)
+    createTechPlateAt(2,8, LEGO_RED, dotWidth(6),0,blockHeight(1),true)
+    createTechPlateAt(2,8, LEGO_RED, dotWidth(14),0,blockHeight(1),true)
+
+    createTechPlateAt(2,8, LEGO_RED, 0,0,plateHeight(-1))
+    createTechPlateAt(2,8, LEGO_RED, dotWidth(6),0,plateHeight(-1))
+    createTechPlateAt(2,8, LEGO_RED, dotWidth(14),0,plateHeight(-1))
+
+    createTechPlateAt(2,6, LEGO_RED, dotWidth(26),dotWidth(1),plateHeight(-1))
+    createTechPlateAt(2,6, LEGO_RED, dotWidth(26),dotWidth(1),blockHeight(1),true)
+
+    createBeamAt(8,1,LEGO_YELLOW, 0,0,blockHeight(1)+plateHeight(1))
+    createBeamAt(8,1,LEGO_YELLOW, 0,dotWidth(7),blockHeight(1)+plateHeight(1))
+
+    createAxleAt(12, LEGO_AXLE_LEFT, 0,dotWidth(-2),0)
+    createAxleAt(12, LEGO_AXLE_LEFT, dotWidth(7),dotWidth(-2),0)
+    createAxleAt(10, LEGO_AXLE_LEFT, dotWidth(26),dotWidth(-1),0)
+
+    t1 = createBigTireAt(7.9,0,axleHeight(), -LEGO_AXLE_LEFT)
+    t2 = createBigTireAt(7.9,dotWidth(8),axleHeight(), LEGO_AXLE_LEFT)
+
+    t3 = createBigTireAt(7.9 + dotWidth(7),0,axleHeight(), -LEGO_AXLE_LEFT)
+    t4 = createBigTireAt(7.9 + dotWidth(7),dotWidth(8),axleHeight(), LEGO_AXLE_LEFT)
+
+    t5 = createBigTireAt(7.9 + dotWidth(26),dotWidth(1),axleHeight(), -LEGO_AXLE_LEFT)
+    t6 = createBigTireAt(7.9 + dotWidth(26),dotWidth(7),axleHeight(), LEGO_AXLE_LEFT)
+}
+// createTruckBase()
+createSmallTireAt(0,0,blockHeight(4), LEGO_AXLE_UP)
+createSmallTireAt(0,dotWidth(4),0, LEGO_AXLE_LEFT)
+// t1 = createSmallTireAt(7.9,dotWidth(-1),axleHeight())
+// t2 = createSmallTireAt(7.9, dotWidth(4),axleHeight())
+// allPieces.push(createBeamAt(12,1,LEGO_YELLOW, 0,0,blockHeight(1)))
+// allPieces.push(createBeamAt(10,1,LEGO_YELLOW, 0,0,blockHeight(2)))
+// allPieces.push(createBeamAt(8,1,LEGO_YELLOW, 0,0,blockHeight(3)))
+// allPieces.push(createBeamAt(6,1,LEGO_YELLOW, 0,0,blockHeight(4)))
+// allPieces.push(createBeamAt(4,1,LEGO_YELLOW, 0,0,blockHeight(5)))
+// allPieces.push(createBeamAt(2,1,LEGO_YELLOW, 0,0,blockHeight(6)))
+// allPieces.push(createBeamAt(2,1,LEGO_YELLOW, 0, dotWidth(18), 0));
 lego_cleanup();
