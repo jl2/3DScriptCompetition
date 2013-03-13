@@ -15,12 +15,14 @@ var origin = cp(0,0,0)
 
 var brickCache = new Object()
 brickCache['plates'] = new Object()
+brickCache['flatplates'] = new Object()
 brickCache['techplates'] = new Object()
 brickCache['blocks'] = new Object()
 brickCache['techbeams'] = new Object()
 brickCache['axles'] = new Object()
 brickCache['bigtire'] = new Object()
 brickCache['smalltire'] = new Object()
+brickCache['pulleys'] = new Object()
 
 brickCache['fancyplates'] = new Object()
 brickCache['fancytechplates'] = new Object()
@@ -138,8 +140,8 @@ var techUnderCylinderLeft = CGM.createCylinder(cp(7.9,0,5.6), left, dotWidth(1),
 techUnderCylinderLeft = CGM.unite(techUnderCylinderLeft, CGM.createCylinder(cp(7.9, dotWidth(1)/2, 0), up, 9.6, 3.0/2))
 helpers.push(techUnderCylinderLeft)
 
-var techUnderCylinderFront = CGM.createCylinder(cp(7.9,0,5.6), front, dotWidth(1), 6.2/2)
-techUnderCylinderFront = CGM.unite(techUnderCylinderFront, CGM.createCylinder(cp(7.9, dotWidth(1)/2, 0), up, 9.6, 3.0/2))
+var techUnderCylinderFront = CGM.createCylinder(cp(0,7.9,5.6), front, dotWidth(1), 6.2/2)
+techUnderCylinderFront = CGM.unite(techUnderCylinderFront, CGM.createCylinder(cp(dotWidth(1)/2,7.9, 0), up, 9.6, 3.0/2))
 helpers.push(techUnderCylinderFront)
 
 // The hollow cylinder under regular bricks
@@ -174,6 +176,26 @@ gearTooth = CGM.sweep(toothProfile,CGM.createLineSegment(cp(0,0,0), cp(0, dotWid
 gearTooth = CGM.translate(gearTooth, cv(0,dotWidth(1)*0.1,0))
 helpers.push(gearTooth)
 
+var crownToothProfile = CGM.unite(
+    CGM.unite(
+        CGM.unite(
+            CGM.createLineSegment(cp(-0.4*2,0,0), cp(0.4*2,0, 0)),
+            CGM.createLineSegment(cp(-0.4*2,0,0), cp(-0.4*2,0, 0.7*2))
+        ),
+        CGM.createLineSegment(cp(0.4*2,0,0), cp(0.4*2,0, 0.7*2))
+    ),
+    CGM.createArcThroughThreePoints(cp(-0.4*2, 0,0.7*2),cp(0,0,1*2),cp(0.4*2,0,0.7*2))
+)
+crownToothProfile = CGM.fill(crownToothProfile)
+crownGearTooth = CGM.sweep(crownToothProfile,CGM.createLineSegment(cp(0,0,0), cp(0, dotWidth(1)/3,0)))
+egs = CGM.getEdges(crownGearTooth)
+crownGearTooth = CGM.fillet([egs[4],egs[8],egs[10]], 0.8)
+var crownGearTop = CGM.createCone(cp(0,dotWidth(1)/3,1.3), cp(0,dotWidth(1)/3+1.4,1.3), 0.7,0.5)
+egs = CGM.getEdges(crownGearTop)
+crownGearTop = CGM.fillet([egs[0], egs[4]], 0.3)
+crownGearTooth = CGM.unite(crownGearTooth, crownGearTop)
+helpers.push(crownGearTooth)
+
 var rad = 4.8/2
 var thirdDiam = 4.8/5
 var len2 = dotWidth(2)
@@ -186,6 +208,7 @@ subAxle = CGM.subtract(subAxle, CGM.createCuboid(cp(-rad, thirdDiam, 0), cp(-thi
 subAxle = CGM.subtract(subAxle, CGM.createCuboid(cp(thirdDiam, -rad, 0), cp(rad, -thirdDiam, len2)))
 subAxle = CGM.fillet(CGM.getEdges(subAxle), 0.5)
 subAxle = CGM.rotate(subAxle, origin, cv(1,0,0), -Math.PI/2);
+subAxle = CGM.translate(subAxle, 0, -dotWidth(1)/2, 0)
 helpers.push(subAxle);
 
 // Create a plate of the given size and color
@@ -234,6 +257,51 @@ function createPlateAt(width, height, color, x,y,z, fancy) {
     }
     var thisCyl = CGM.clone(plateUnderCylinder);
     blockSoFar = CGM.unite(blockSoFar, CGM.applyPatternToFeature(CGM.getFaces(thisCyl), trans));
+    // CGM.Part.remove(thisCyl)
+    // Add it to the cache
+    brickCache[cachename][descString] = blockSoFar;
+
+    // Set the color and return it
+    var tmp = CGM.clone(brickCache[cachename][descString]);
+    tmp = CGM.Property.setColor(tmp, LEGO_COLORS[color])
+    tmp = CGM.translate(tmp, x,y,z);
+    allPieces.push(tmp)
+    return tmp
+}
+
+function createFlatPlateAt(width, height, color, x,y,z) {
+    // Check the cache
+    var descString = "" + width + "x" + height
+    var cachename = 'flatplates'
+    if (brickCache[cachename][descString]) {
+        // It was in the cache, so set the color and return it
+        var tmp = CGM.clone(brickCache[cachename][descString]);
+        tmp = CGM.Property.setColor(tmp, LEGO_COLORS[color])
+        tmp = CGM.translate(tmp, x,y,z);
+        allPieces.push(tmp)
+        return tmp
+    }
+    // It wasn't in the cache, so create it
+    var trans = new Array()
+    var blockSoFar = CGM.createCuboid(0,0,0,width*P-0.2,height*P-0.2,h)
+
+    blockSoFar = CGM.subtract(blockSoFar, CGM.createCuboid(1.2,1.2,0, width*P-1.4,height*P-1.4,h - 1.0))
+
+    var thisHole = CGM.clone(smallHole)
+    blockSoFar = CGM.subtract(blockSoFar, CGM.applyPatternToFeature(CGM.getFaces(thisHole), trans));
+
+    if (width>1 && height>1) {
+        trans = new Array()
+        for (var uci = 0; uci<width-1; ++uci) {
+            for (var ucj = 0; ucj<height-1; ++ucj) {
+                trans.push(CGM.createTranslation(uci * 8, ucj * 8, 0));
+            }
+        }
+        var thisCyl = CGM.clone(plateUnderCylinder);
+        blockSoFar = CGM.unite(blockSoFar, CGM.applyPatternToFeature(CGM.getFaces(thisCyl), trans));
+    }
+    var bedges = CGM.getEdges(blockSoFar)
+    blockSoFar = CGM.chamfer([bedges[9], bedges[11], bedges[13], bedges[15]], 0.2)
     // CGM.Part.remove(thisCyl)
     // Add it to the cache
     brickCache[cachename][descString] = blockSoFar;
@@ -472,7 +540,7 @@ function createAxleAt(x,y,z,length, direction, arot) {
     default:
         thisAxle = CGM.rotate(thisAxle, origin, cv(0,1,0), -Math.PI/2)
         brickCache['axles']["front" + length] = thisAxle
-        tmp = CGM.Property.setRGBA(CGM.clone(brickCache['axles']["left" + length]), 20,20,20,255);
+        tmp = CGM.Property.setRGBA(CGM.clone(brickCache['axles']["front" + length]), 20,20,20,255);
         tmp = CGM.rotate(tmp, cp(0,0,0), front, arot)
         tmp = CGM.translate(tmp, x,y,z)
         allPieces.push(tmp)
@@ -518,7 +586,7 @@ function createSmallGearAt(x,y,z,normal, arot) {
 
         for (var i = 0; i<8;++i) {
             var thisTooth = CGM.clone(gearTooth)
-            thisTooth = CGM.translate(thisTooth, 0,0,6.2/2)
+            thisTooth = CGM.translate(thisTooth, 0,0,0.9*6.2/2)
             thisTooth = CGM.rotate(thisTooth, cp(0,0,0), left, i * Math.PI/4)
             gear = CGM.unite(gear, thisTooth)
         }
@@ -527,10 +595,53 @@ function createSmallGearAt(x,y,z,normal, arot) {
         gear = CGM.clone(brickCache["gears"]["small"])
         
     }
+    
     var tmp = rotateToDirection([gear], normal, arot)
     gear = tmp[0]
     gear = CGM.translate(gear, x,y,z)
     gear = CGM.Property.setColor(gear, LEGO_COLORS[LEGO_GREY])
+    allPieces.push(gear)
+    return gear
+}
+
+function createCrownGearAt(x,y,z, normal,arot) {
+    var gear;
+    if (brickCache["gears"]["crown"]) {
+        gear = CGM.clone(brickCache["gears"]["crown"])
+    } else {
+        var gear = CGM.createCylinder(cp(0,0,0), left, dotWidth(1)/3, dotWidth(1.5)-1.4)
+        gear = CGM.subtract(gear, CGM.createCylinder(cp(0,0,0), left, dotWidth(1)/3, dotWidth(0.7)))
+        gear = CGM.unite(gear, CGM.createCuboid(cp(-dotWidth(0.7), 0, -2.8), cp(dotWidth(0.7), dotWidth(1)/3,-0.4)))
+        gear = CGM.unite(gear, CGM.createCuboid(cp(-dotWidth(0.7), 0, 0.4), cp(dotWidth(0.7), dotWidth(1)/3,2.8)))
+        var hub = CGM.createCylinder(cp(0,0,0), left, dotWidth(1), 6.2/1.8)
+        egs = CGM.getEdges(hub)
+        hub = CGM.fillet([egs[2], egs[5]], 0.5)
+
+        gear = CGM.unite(gear, hub)
+        gear = CGM.subtract(gear, CGM.createCuboid(cp(-dotWidth(0.7), 0,-0.4), cp(dotWidth(0.7), dotWidth(1), 0.4)))
+        gear = CGM.fillet(CGM.getEdges(gear), 0.2)
+        
+        gear = CGM.subtract(gear, CGM.clone(subAxle))
+
+        // 
+        // gear = CGM.fillet(CGM.getEdges(gear), 0.125)
+        
+        for (var i = 0; i<24;++i) {
+            var thisTooth = CGM.clone(crownGearTooth)
+            
+            thisTooth = CGM.translate(thisTooth, 0,0,dotWidth(1.5)-1.4)
+            thisTooth = CGM.rotate(thisTooth, cp(0,0,0), left, i * Math.PI/12)
+            gear = CGM.unite(gear, thisTooth)
+        }
+        
+        brickCache["gears"]["crown"] = gear
+        gear = CGM.clone(brickCache["gears"]["crown"])
+    }
+    var tmp = rotateToDirection([gear], normal, arot)
+    gear = tmp[0]
+    gear = CGM.translate(gear, x,y,z)
+    gear = CGM.Property.setColor(gear, LEGO_COLORS[LEGO_GREY])
+    allPieces.push(gear)
     return gear
 }
 
@@ -675,13 +786,38 @@ function createBigTireAt(x,y,z, normal, arot) {
 }
 
 function createPulleyAt(x,y,z, normal, arot) {
-    // var pulley = CGM.createCylinder(
-    //     for (var i = 0; i<6;++i) {
-    //         var thisHole = CGM.createCylinder(cp(0,0,0), left, dotWidth(2), 4.8/2)
-    //         thisHole = CGM.translate(thisHole, dotWidth(1), 0,0)
-    //         thisHole = CGM.rotate(thisHole, cp(0,0,0), left, i * Math.PI/3)
-    //         rim = CGM.subtract(rim, thisHole)
-    //     }
+    var pulley;
+    if (brickCache["pulleys"]["medium"]) {
+        pulley = CGM.clone(brickCache["pulleys"]["medium"])
+    } else {
+        var outter = CGM.createCylinder(cp(0,0,0), left, dotWidth(1)/3, dotWidth(1.5))
+        outter = CGM.subtract(outter, CGM.createCylinder(cp(0,0,0), left, dotWidth(1)/3, dotWidth(1.25)))
+        egs = CGM.getEdges(outter)
+        outter = CGM.chamfer([egs[6],egs[7],egs[8],egs[9]], 0.6)
+        egs = CGM.getEdges(outter)
+        outter = CGM.fillet([egs[0], egs[2], egs[4], egs[5]], 0.5)
+
+        var tw = dotWidth(1)/3
+        var pulley = CGM.unite(outter, CGM.createCylinder(cp(0,tw/5,0), left, 3*tw/5, dotWidth(1.4)))
+        pulley = CGM.unite(pulley, CGM.createCylinder(cp(0,0,0), left, dotWidth(1)/3, 6.2/2))
+
+        for (var i = 0; i<6;++i) {
+            var thisHole = CGM.createCylinder(cp(0,0,0), left, dotWidth(2), 4.8/2)
+            thisHole = CGM.translate(thisHole, dotWidth(1), 0,0)
+            thisHole = CGM.rotate(thisHole, cp(0,0,0), left, i * Math.PI/3)
+            pulley = CGM.subtract(pulley, thisHole)
+        }
+        
+        brickCache["pulleys"]["medium"] = gear
+        gear = CGM.clone(brickCache["pulleys"]["medium"])
+        
+    }
+    
+    var tmp = rotateToDirection([pulley], normal, arot)
+    pulley = tmp[0]
+    pulley = CGM.translate(pulley, x,y,z)
+    pulley = CGM.Property.setColor(pulley, LEGO_COLORS[LEGO_GREY])
+    return gear
 }
 
 function createConnectorAt(x,y,z) {
@@ -819,17 +955,47 @@ function createTruckBase() {
     t5 = createBigTireAt(axleOffset() + dotWidth(26),dotWidth(1),axleHeight(), -LEGO_AXLE_LEFT)
     t6 = createBigTireAt(axleOffset() + dotWidth(26),dotWidth(7),axleHeight(), LEGO_AXLE_LEFT)
 }
-beam = createBeamAt(8,1,LEGO_YELLOW, 0,0,0)
-a1 = createAxleAt(axleOffset() + dotWidth(0),dotWidth(-1),axleHeight(), 4, LEGO_AXLE_LEFT, 0)
-a2 = createAxleAt(axleOffset() + dotWidth(1),dotWidth(-1),axleHeight(), 4, LEGO_AXLE_LEFT, Math.PI/8)
-a3 = createAxleAt(axleOffset() + dotWidth(2),dotWidth(-1),axleHeight(), 4, LEGO_AXLE_LEFT, 0)
-a4 = createAxleAt(axleOffset() + dotWidth(3),dotWidth(-1),axleHeight(), 4, LEGO_AXLE_LEFT, Math.PI/8)
+function simpleGears() {
+    beam = createBeamAt(8,1,LEGO_YELLOW, 0,0,0)
+    a1 = createAxleAt(axleOffset() + dotWidth(0),dotWidth(-1),axleHeight(), 4, LEGO_AXLE_LEFT, 0)
+    a2 = createAxleAt(axleOffset() + dotWidth(1),dotWidth(-1),axleHeight(), 4, LEGO_AXLE_LEFT, Math.PI/8)
+    a3 = createAxleAt(axleOffset() + dotWidth(2),dotWidth(-1),axleHeight(), 4, LEGO_AXLE_LEFT, 0)
+    a4 = createAxleAt(axleOffset() + dotWidth(3),dotWidth(-1),axleHeight(), 4, LEGO_AXLE_LEFT, Math.PI/8)
+    a5 = createAxleAt(axleOffset() + dotWidth(5),dotWidth(-1),axleHeight(), 4, LEGO_AXLE_LEFT, 0)
 
-g1 = createSmallGearAt(axleOffset() + dotWidth(0),dotWidth(1),axleHeight(), 4, LEGO_AXLE_LEFT, 0)
-g2 = createSmallGearAt(axleOffset() + dotWidth(1),dotWidth(1),axleHeight(), 4, LEGO_AXLE_LEFT, Math.PI/8)
-g3 = createSmallGearAt(axleOffset() + dotWidth(2),dotWidth(1),axleHeight(), 4, LEGO_AXLE_LEFT, 0)
-g4 = createSmallGearAt(axleOffset() + dotWidth(3),dotWidth(1),axleHeight(), 4, LEGO_AXLE_LEFT, Math.PI/8)
+    g1 = createSmallGearAt(axleOffset() + dotWidth(0),dotWidth(1),axleHeight(), LEGO_AXLE_LEFT, 0)
+    g2 = createSmallGearAt(axleOffset() + dotWidth(1),dotWidth(1),axleHeight(), LEGO_AXLE_LEFT, Math.PI/8)
+    g3 = createSmallGearAt(axleOffset() + dotWidth(2),dotWidth(1),axleHeight(), LEGO_AXLE_LEFT, 0)
+    g4 = createSmallGearAt(axleOffset() + dotWidth(3),dotWidth(1),axleHeight(), LEGO_AXLE_LEFT, Math.PI/8)
 
+    g5 = createCrownGearAt(axleOffset() + dotWidth(5),dotWidth(1),axleHeight(), LEGO_AXLE_LEFT, 0)
+}
+
+function angledGears() {
+    beam = createBeamAt(8,1,LEGO_YELLOW, 0,0,0)
+    a1 = createAxleAt(axleOffset() + dotWidth(5),dotWidth(-1),axleHeight(), 4, LEGO_AXLE_LEFT, 0)
+    g1 = createCrownGearAt(axleOffset() + dotWidth(5),dotWidth(1),axleHeight(), LEGO_AXLE_LEFT, 0)
+
+    p1 = createTechPlateAt(2,4, LEGO_RED, dotWidth(2),0,plateHeight(-1))
+
+    p2 = createTechPlateAt(2,4, LEGO_RED, dotWidth(2),0,blockHeight(1), true)
+
+    crossBeam = createBeamAt(1,2,LEGO_YELLOW, dotWidth(3), dotWidth(1), 0)
+    a2 = createAxleAt(dotWidth(5),axleOffset() + dotWidth(1),axleHeight(), 4, LEGO_AXLE_FRONT, Math.PI/8)
+    // a2 = CGM.rotate(a2, origin, up, -Math.PI/2)
+    g2 = createSmallGearAt(dotWidth(5), axleOffset()+ dotWidth(1), axleHeight(), LEGO_AXLE_FRONT, Math.PI/8)
+    // a1 = createAxleAt(axleOffset() + dotWidth(0),dotWidth(-1),axleHeight(), 4, LEGO_AXLE_LEFT, 0)
+    // a2 = createAxleAt(axleOffset() + dotWidth(1),dotWidth(-1),axleHeight(), 4, LEGO_AXLE_LEFT, Math.PI/8)
+    // a3 = createAxleAt(axleOffset() + dotWidth(2),dotWidth(-1),axleHeight(), 4, LEGO_AXLE_LEFT, 0)
+    // a4 = createAxleAt(axleOffset() + dotWidth(3),dotWidth(-1),axleHeight(), 4, LEGO_AXLE_LEFT, Math.PI/8)
+    // g1 = createSmallGearAt(axleOffset() + dotWidth(0),dotWidth(1),axleHeight(), LEGO_AXLE_LEFT, 0)
+    // g2 = createSmallGearAt(axleOffset() + dotWidth(1),dotWidth(1),axleHeight(), LEGO_AXLE_LEFT, Math.PI/8)
+    // g3 = createSmallGearAt(axleOffset() + dotWidth(2),dotWidth(1),axleHeight(), LEGO_AXLE_LEFT, 0)
+    // g4 = createSmallGearAt(axleOffset() + dotWidth(3),dotWidth(1),axleHeight(), LEGO_AXLE_LEFT, Math.PI/8)
+
+
+}
+angledGears()
 // g1 = createSmallGearAt(axleOffset(),dotWidth(1),axleHeight(), LEGO_AXLE_LEFT, 0)
 
 
