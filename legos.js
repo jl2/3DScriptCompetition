@@ -136,11 +136,11 @@ techHoleFront = CGM.unite(techHoleFront, CGM.createCylinder(cp(7.8-1.5,7.9,5.6),
 helpers.push(techHoleFront)
 
 // The small cylinder in technic beams - not used yet
-var techUnderCylinderLeft = CGM.createCylinder(cp(7.9,0,5.6), left, dotWidth(1), 6.2/2)
+var techUnderCylinderLeft = CGM.createCylinder(cp(7.9,0,5.6), left, dotWidth(1), 7/2)
 techUnderCylinderLeft = CGM.unite(techUnderCylinderLeft, CGM.createCylinder(cp(7.9, dotWidth(1)/2, 0), up, 9.6, 3.0/2))
 helpers.push(techUnderCylinderLeft)
 
-var techUnderCylinderFront = CGM.createCylinder(cp(0,7.9,5.6), front, dotWidth(1), 6.2/2)
+var techUnderCylinderFront = CGM.createCylinder(cp(0,7.9,5.6), front, dotWidth(1), 7/2)
 techUnderCylinderFront = CGM.unite(techUnderCylinderFront, CGM.createCylinder(cp(dotWidth(1)/2,7.9, 0), up, 9.6, 3.0/2))
 helpers.push(techUnderCylinderFront)
 
@@ -190,6 +190,8 @@ crownToothProfile = CGM.fill(crownToothProfile)
 crownGearTooth = CGM.sweep(crownToothProfile,CGM.createLineSegment(cp(0,0,0), cp(0, dotWidth(1)/3,0)))
 egs = CGM.getEdges(crownGearTooth)
 crownGearTooth = CGM.fillet([egs[4],egs[8],egs[10]], 0.8)
+egs = CGM.getEdges(crownGearTooth)
+crownGearTooth = CGM.fillet([egs[7], egs[14]],0.8)
 var crownGearTop = CGM.createCone(cp(0,dotWidth(1)/3,1.3), cp(0,dotWidth(1)/3+1.4,1.3), 0.7,0.5)
 egs = CGM.getEdges(crownGearTop)
 crownGearTop = CGM.fillet([egs[0], egs[4]], 0.3)
@@ -500,7 +502,20 @@ function createAxleAt(x,y,z,length, direction, arot) {
     var descString = axleDescs[direction] + length;
     if (brickCache['axles'][descString]) {
         tmp = CGM.Property.setRGBA(CGM.clone(brickCache['axles'][descString]), 20,20,20,255);
-        tmp = CGM.rotate(tmp, cp(0,0,0), left, arot)
+        if (arot) {
+            App.print("Rotating axle: " + arot)
+            switch (direction) {
+            case LEGO_AXLE_UP:
+                tmp = CGM.rotate(tmp, cp(0,0,0), up, arot)
+                break;
+            case LEGO_AXLE_LEFT:
+                tmp = CGM.rotate(tmp, cp(0,0,0), left, arot)
+                break;
+            default:
+                tmp = CGM.rotate(tmp, cp(0,0,0), front, arot)
+                break;
+            }
+        }
         tmp = CGM.translate(tmp, x,y,z)
         allPieces.push(tmp)
         return tmp
@@ -517,14 +532,14 @@ function createAxleAt(x,y,z,length, direction, arot) {
     thisAxle = CGM.subtract(thisAxle, sub4)
 
     thisAxle = CGM.fillet(CGM.getEdges(thisAxle), 0.5)
-    brickCache['axles']["up" + length] = thisAxle
-    thisAxle = CGM.clone(brickCache['axles']["up" + length]);
 
     var tmp;
     switch (direction) {
     case LEGO_AXLE_UP:
-        thisAxle = CGM.rotate(thisAxle, cp(0,0,0), up, arot)
-        tmp = CGM.setRGBA(thisAxle, 20,20,20,255)
+        brickCache['axles']["up" + length] = thisAxle
+        tmp = CGM.PropertysetRGBA(CGM.clone(brickCache['axles']["up" + length]), 20,20,20,255)
+        tmp = CGM.rotate(thisAxle, cp(0,0,0), up, arot)
+        tmp = CGM.translate(tmp, x,y,z)
         allPieces.push(tmp)
         return tmp
         break;
@@ -554,7 +569,7 @@ function rotateToDirection(parts, normal, arot) {
         rim = parts[prt]
         if (arot) {
             App.print("Rotating: " + arot)
-            rim = CGM.rotate(rim, cp(0,0,0), left, arot)
+            rim = CGM.rotate(rim, cp(0,0,0), cv(0,-1,0), arot)
         }
         if (normal == LEGO_AXLE_UP) {
             rim = CGM.rotate(rim, cp(0,0,0), cv(1,0,0), -Math.PI/2)
@@ -563,7 +578,7 @@ function rotateToDirection(parts, normal, arot) {
         } else if (normal == LEGO_AXLE_LEFT) {
             ;
         } else if (normal == -LEGO_AXLE_LEFT) {
-            rim = CGM.rotate(rim, cp(0,0,0), cv(0,0,1), -Math.PI)
+            rim = CGM.rotate(rim, cp(0,0,0), cv(0,1,0), -Math.PI)
         } else if (normal == LEGO_AXLE_FRONT) {
             rim = CGM.rotate(rim, cp(0,0,0), cv(0,0,1), Math.PI/2)
         } else if (normal == -LEGO_AXLE_FRONT) {
@@ -973,17 +988,20 @@ function simpleGears() {
 
 function angledGears() {
     beam = createBeamAt(8,1,LEGO_YELLOW, 0,0,0)
-    a1 = createAxleAt(axleOffset() + dotWidth(5),dotWidth(-1),axleHeight(), 4, LEGO_AXLE_LEFT, 0)
-    g1 = createCrownGearAt(axleOffset() + dotWidth(5),dotWidth(1),axleHeight(), LEGO_AXLE_LEFT, 0)
+    a1 = createAxleAt(axleOffset() + dotWidth(5),dotWidth(-1),axleHeight(), 4, LEGO_AXLE_LEFT, Math.PI/8)
+    g1 = createCrownGearAt(axleOffset() + dotWidth(5),dotWidth(1),axleHeight(), LEGO_AXLE_LEFT, -Math.PI/8)
 
-    p1 = createTechPlateAt(2,4, LEGO_RED, dotWidth(2),0,plateHeight(-1))
+    p1 = createTechPlateAt(2,6, LEGO_RED, dotWidth(2),0,plateHeight(-1))
 
-    p2 = createTechPlateAt(2,4, LEGO_RED, dotWidth(2),0,blockHeight(1), true)
+    p2 = createTechPlateAt(2,6, LEGO_RED, dotWidth(2),0,blockHeight(1), true)
 
-    crossBeam = createBeamAt(1,2,LEGO_YELLOW, dotWidth(3), dotWidth(1), 0)
-    a2 = createAxleAt(dotWidth(5),axleOffset() + dotWidth(1),axleHeight(), 4, LEGO_AXLE_FRONT, Math.PI/8)
-    // a2 = CGM.rotate(a2, origin, up, -Math.PI/2)
-    g2 = createSmallGearAt(dotWidth(5), axleOffset()+ dotWidth(1), axleHeight(), LEGO_AXLE_FRONT, Math.PI/8)
+    crossBeam = createBeamAt(1,4,LEGO_YELLOW, dotWidth(3), dotWidth(1), 0)
+
+    a2 = createAxleAt(dotWidth(5),axleOffset() + dotWidth(1),axleHeight(), 4, LEGO_AXLE_FRONT, 0)
+    g2 = createSmallGearAt(dotWidth(4), axleOffset()+ dotWidth(1), axleHeight(), -LEGO_AXLE_FRONT, 0)
+
+    a3 = createAxleAt(dotWidth(5),axleOffset() + dotWidth(3),axleHeight(), 4, LEGO_AXLE_FRONT, Math.PI/8)
+    g3 = createCrownGearAt(dotWidth(4), axleOffset()+ dotWidth(3), axleHeight(), -LEGO_AXLE_FRONT, -Math.PI/8)
     // a1 = createAxleAt(axleOffset() + dotWidth(0),dotWidth(-1),axleHeight(), 4, LEGO_AXLE_LEFT, 0)
     // a2 = createAxleAt(axleOffset() + dotWidth(1),dotWidth(-1),axleHeight(), 4, LEGO_AXLE_LEFT, Math.PI/8)
     // a3 = createAxleAt(axleOffset() + dotWidth(2),dotWidth(-1),axleHeight(), 4, LEGO_AXLE_LEFT, 0)
