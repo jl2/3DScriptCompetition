@@ -1,0 +1,1 @@
+A Sierpinski Gasket fractal written in Javascript for 3DScript.
