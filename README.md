@@ -6,8 +6,8 @@ My entry is going to be something made out of Legos, but I'm not exactly sure wh
 
 Here are some samples of what I have so far:
 
-![Underside of "regular" blocks](https://www.dropbox.com/s/f8mtbpg9l7dhpxi/lego2.png)
+![Underside of "regular" blocks](http://jlarocco.smugmug.com/photos/i-M5FTwq6/0/O/i-M5FTwq6.png)
 
-![Some Technic pieces, including gears](https://www.dropbox.com/s/fu7xc4cjda2kyx4/lego7.png)
+![Some Technic pieces, including gears](http://jlarocco.smugmug.com/photos/i-RDvgp9q/0/O/i-RDvgp9q.png)
 
-![Underside of Technic blocks, with large wheels](https://www.dropbox.com/s/7z85257nidmpkdz/lego5.png)
+![Underside of Technic blocks, with large wheels](http://jlarocco.smugmug.com/photos/i-Wd48JQC/0/O/i-Wd48JQC.png)
