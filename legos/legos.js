@@ -30,6 +30,9 @@ brickCache['axles'] = new Object()
 brickCache['bigtire'] = new Object()
 brickCache['smalltire'] = new Object()
 brickCache['pulleys'] = new Object()
+brickCache['connectors'] = new Object()
+
+brickCache['stoppers'] = new Object()
 
 brickCache['fancyplates'] = new Object()
 brickCache['fancytechplates'] = new Object()
@@ -546,7 +549,6 @@ function createAxleAt(x,y,z,length, direction, arot) {
     if (brickCache['axles'][descString]) {
         tmp = CGM.Property.setRGBA(CGM.clone(brickCache['axles'][descString]), 20,20,20,255)
         if (arot) {
-            App.print("Rotating axle: " + arot)
             switch (direction) {
             case LEGO_AXLE_UP:
                 tmp = CGM.rotate(tmp, cp(0,0,0), up, arot)
@@ -841,7 +843,7 @@ function createBigTireAt(x,y,z, normal, arot) {
     allPieces.push(tire)
     return [rim, tire]
 }
-brickCache['pulleys']['medium'] = 0
+
 function createPulleyAt(x,y,z, normal, arot) {
     var pulley
     if (brickCache["pulleys"]["medium"]) {
@@ -884,10 +886,123 @@ function createPulleyAt(x,y,z, normal, arot) {
     return pulley
 }
 
-function createConnectorAt(x,y,z) {
+function createConnectorAt(x,y,z, direction, arot) {
+    var connector
+    if (brickCache["connectors"]["regular"]) {
+        connector = CGM.clone(brickCache["connectors"]["regular"])
+    } else {
+        var rad = 4.8/2
+        var thirdDiam = 4.8/5
+        var thisLen = dotWidth(2)
+
+        connector = CGM.createCylinder(cp(0,0,0), left, dotWidth(2), rad)
+        connector = CGM.unite(connector, CGM.createCylinder(cp(0,dotWidth(1)-0.4,0), left, 0.8, 6.0/2))
+        connector = CGM.unite(connector, CGM.createCylinder(cp(0,0,0), left, 0.8, 6.0/2))
+        connector = CGM.unite(connector, CGM.createCylinder(cp(0,dotWidth(2)-0.8,0), left, 0.8, 6.0/2))
+        connector = CGM.subtract(connector, CGM.createCylinder(cp(0,0,0), left, dotWidth(2), 1.6))
+
+        connector = CGM.subtract(connector, CGM.fillet(CGM.getEdges(CGM.createCuboid(-4.1,-4,-0.5,4.1, 4,0.5)), 0.5))
+        connector = CGM.subtract(connector, CGM.fillet(CGM.getEdges(CGM.createCuboid(-4.1,dotWidth(2)-4,-0.5, 4.1, dotWidth(2)+4,0.5)), 0.5))
+
+        brickCache['connectors']['regular'] = connector
+        connector = CGM.clone(brickCache['connectors']['regular'])
+    }
+    
+    var tmp = rotateToDirection([connector], direction, arot)
+    connector = tmp[0]
+    connector = CGM.translate(connector, x,y,z)
+    connector = CGM.Property.setColor(connector, LEGO_COLORS[LEGO_GREY])
+    return connector
 }
 
-function createSmallConnectorAt(x,y,z) {
+function createSmallConnectorAt(x,y,z, direction,arot) {
+    var connector
+    if (brickCache["connectors"]["small"]) {
+        connector = CGM.clone(brickCache["connectors"]["small"])
+    } else {
+        var rad = 4.8/2
+        var thirdDiam = 4.8/5
+        var thisLen = dotWidth(2)
+
+        connector = CGM.createCylinder(cp(0,0,0), left, 1.3*dotWidth(1), rad)
+        connector = CGM.unite(connector, CGM.createCylinder(cp(0,dotWidth(1)-0.4,0), left, 0.8, 6.0/2))
+        connector = CGM.unite(connector, CGM.createCylinder(cp(0,0,0), left, 0.8, 6.0/2))
+        connector = CGM.subtract(connector, CGM.createCylinder(cp(0,0,0), left, dotWidth(2), 1.6))
+
+        connector = CGM.subtract(connector, CGM.fillet(CGM.getEdges(CGM.createCuboid(-4.1,-4,-0.5,4.1, 4,0.5)), 0.5))
+
+        brickCache['connectors']['small'] = connector
+        connector = CGM.clone(brickCache['connectors']['small'])
+    }
+    
+    var tmp = rotateToDirection([connector], direction, arot)
+    connector = tmp[0]
+    connector = CGM.translate(connector, x,y,z)
+    connector = CGM.Property.setColor(connector, LEGO_COLORS[LEGO_GREY])
+    return connector
+}
+
+function createAxleConnectorAt(x,y,z, direction, arot) {
+    var connector
+    if (brickCache["connectors"]["axle"]) {
+        connector = CGM.clone(brickCache["connectors"]["axle"])
+    } else {
+        var rad = 4.8/2
+        var thirdDiam = 4.8/5
+        var thisLen = dotWidth(2)
+        connector = CGM.translate(CGM.clone(subAxle), 0,dotWidth(1)*0.5, 0)
+        connector = CGM.subtract(connector, CGM.createCylinder(cp(0,0,0), left, dotWidth(1), rad))
+
+        connector = CGM.unite(connector, CGM.createCylinder(cp(0,0,0), left, dotWidth(1), rad))
+        connector = CGM.unite(connector, CGM.createCylinder(cp(0,dotWidth(1)-0.4,0), left, 0.8, 6.0/2))
+        connector = CGM.unite(connector, CGM.createCylinder(cp(0,0,0), left, 0.8, 6.0/2))
+        connector = CGM.subtract(connector, CGM.createCylinder(cp(0,0,0), left, dotWidth(1), 1.6))
+        connector = CGM.subtract(connector, CGM.fillet(CGM.getEdges(CGM.createCuboid(-4.1,-4,-0.5,4.1, 4,0.5)), 0.5))
+        
+        brickCache['connectors']['axle'] = connector
+        connector = CGM.clone(brickCache['connectors']['axle'])
+    }
+    
+    var tmp = rotateToDirection([connector], direction, arot)
+    connector = tmp[0]
+    connector = CGM.translate(connector, x,y,z)
+    connector = CGM.Property.setColor(connector, LEGO_COLORS[LEGO_GREY])
+    return connector
+}
+
+brickCache['stoppers']['regular']=0
+function createStopperAt(x,y,z, direction,arot) {
+    var stopper
+    if (brickCache["stoppers"]["regular"]) {
+        stopper = CGM.clone(brickCache["stoppers"]["regular"])
+    } else {
+        var rad = 4.8/2
+        var thirdDiam = 4.8/5
+        // 3.73352380504785 3.733523804282091
+        off = 3.73352380504785
+        stopper = CGM.createCylinder(cp(0,0,0), left, dotWidth(1), rad*1.2)
+        stopper = CGM.unite(stopper, CGM.createCylinder(cp(0,0,0), left, 0.8, dotWidth(1)*0.45))
+        stopper = CGM.unite(stopper, CGM.createCylinder(cp(0,dotWidth(1)-0.8,0), left, 0.8, dotWidth(1)*0.45))
+
+        stopper = CGM.subtract(stopper, CGM.createCylinder(cp(-off,-1,-off), left, dotWidth(1)*0.5, 2.4))
+        stopper = CGM.subtract(stopper, CGM.createCylinder(cp(off,-1,-off), left, dotWidth(1)*0.5, 2.4))
+        stopper = CGM.subtract(stopper, CGM.createCylinder(cp(off,-1,off), left, dotWidth(1)*0.5, 2.4))
+        stopper = CGM.subtract(stopper, CGM.createCylinder(cp(-off,-1,off), left, dotWidth(1)*0.5, 2.4))
+
+        stopper = CGM.subtract(stopper, CGM.clone(subAxle))
+        stopper = CGM.fillet(CGM.getEdges(stopper), 0.125)
+        stopper = CGM.subtract(stopper, CGM.fillet(CGM.getEdges(CGM.createCuboid(-dotWidth(1),dotWidth(1)*0.2,-0.5, dotWidth(1), dotWidth(1)*0.8,0.5)), 0.5))
+
+
+        brickCache['stoppers']['regular'] = stopper
+        stopper = CGM.clone(brickCache['stoppers']['regular'])
+    }
+    
+    var tmp = rotateToDirection([stopper], direction, arot)
+    stopper = tmp[0]
+    stopper = CGM.translate(stopper, x,y,z)
+    stopper = CGM.Property.setColor(stopper, LEGO_COLORS[LEGO_GREY])
+    return stopper
 }
 
 function randomColor() {
@@ -1087,6 +1202,32 @@ function angledGears() {
 // allPieces.push(createBeamAt(4,1,LEGO_YELLOW, 0,0,blockHeight(5)))
 // allPieces.push(createBeamAt(2,1,LEGO_YELLOW, 0,0,blockHeight(6)))
 // allPieces.push(createBeamAt(2,1,LEGO_YELLOW, 0, dotWidth(18), 0))
-createPulleyAt(0,0,0,LEGO_AXLE_LEFT, 0)
+App.clearDocument()
+function usePulleys() {
+    beam = createBeamAt(8,1,LEGO_YELLOW, 0,0,0)
+    a1 = createAxleAt(axleOffset() + dotWidth(6),dotWidth(-1),axleHeight(), 4, LEGO_AXLE_LEFT, -Math.PI/8)
+    g1 = createCrownGearAt(axleOffset() + dotWidth(6),dotWidth(1),axleHeight(), LEGO_AXLE_LEFT, Math.PI/8)
+    s1 = createStopperAt(axleOffset() + dotWidth(6),dotWidth(-1),axleHeight(), LEGO_AXLE_LEFT, Math.PI/8)
+
+    c1 = createAxleConnectorAt(axleOffset() + dotWidth(4), dotWidth(0), axleHeight(), LEGO_AXLE_LEFT, 0)
+    g2 = createSmallGearAt(axleOffset() + dotWidth(4),dotWidth(1),axleHeight(), LEGO_AXLE_LEFT, 0)
+
+    c2 = createAxleConnectorAt(axleOffset() + dotWidth(3), dotWidth(0), axleHeight(), LEGO_AXLE_LEFT, -Math.PI/8)
+    g3 = createSmallGearAt(axleOffset() + dotWidth(3),dotWidth(1),axleHeight(), LEGO_AXLE_LEFT, -Math.PI/8)
+
+    a3 = createAxleAt(axleOffset() + dotWidth(2),dotWidth(-2),axleHeight(), 4, LEGO_AXLE_LEFT, 0)
+    g4 = createSmallGearAt(axleOffset() + dotWidth(2),dotWidth(1),axleHeight(), LEGO_AXLE_LEFT, 0)
+
+    p1 = createPulleyAt(axleOffset() + dotWidth(2),-dotWidth(1)/3, axleHeight(),LEGO_AXLE_LEFT, 0)
+    p2 = createPulleyAt(axleOffset() + dotWidth(2),-2*dotWidth(1)/3, axleHeight(),LEGO_AXLE_LEFT, 0)
+    p3 = createPulleyAt(axleOffset() + dotWidth(2),-dotWidth(1), axleHeight(),LEGO_AXLE_LEFT, 0)
+
+    c3 = createConnectorAt(axleOffset() + dotWidth(1), -dotWidth(2), axleHeight(), LEGO_AXLE_LEFT, 0)
+    c4 = createConnectorAt(axleOffset() + dotWidth(3), -dotWidth(2), axleHeight(), LEGO_AXLE_LEFT, 0)
+    t1 = createBigTireAt(axleOffset()+dotWidth(2),-dotWidth(2),axleHeight(), LEGO_AXLE_LEFT,0)
+
+}
+usePulleys()
+
 lego_cleanup()
 // ཧྐྵྨླྺྼྻྂ
