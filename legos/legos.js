@@ -260,7 +260,7 @@ subAxle = CGM.translate(subAxle, 0, -dotWidth(1)/2, 0)
 helpers.push(subAxle)
 
 // Create a plate of the given size and color
-function createPlateAt(width, height, color, x,y,z, fancy) {
+function createPlateAt(x,y,z,width, height, color, fancy) {
     // Check the cache
     var descString = "" + width + "x" + height
     var cachename = "plates"
@@ -297,14 +297,16 @@ function createPlateAt(width, height, color, x,y,z, fancy) {
     var thisHole = CGM.clone(smallHole)
     blockSoFar = CGM.subtract(blockSoFar, CGM.applyPatternToFeature(CGM.getFaces(thisHole), trans))
 
-    trans = new Array()
-    for (var uci = 0; uci<width-1; ++uci) {
-        for (var ucj = 0; ucj<height-1; ++ucj) {
-            trans.push(CGM.createTranslation(uci * 8, ucj * 8, 0))
+    if (width>1 && height>1) {
+        trans = new Array()
+        for (var uci = 0; uci<width-1; ++uci) {
+            for (var ucj = 0; ucj<height-1; ++ucj) {
+                trans.push(CGM.createTranslation(uci * 8, ucj * 8, 0))
+            }
         }
+        var thisCyl = CGM.clone(plateUnderCylinder)
+        blockSoFar = CGM.unite(blockSoFar, CGM.applyPatternToFeature(CGM.getFaces(thisCyl), trans))
     }
-    var thisCyl = CGM.clone(plateUnderCylinder)
-    blockSoFar = CGM.unite(blockSoFar, CGM.applyPatternToFeature(CGM.getFaces(thisCyl), trans))
     // CGM.Part.remove(thisCyl)
     // Add it to the cache
     brickCache[cachename][descString] = blockSoFar
@@ -317,7 +319,7 @@ function createPlateAt(width, height, color, x,y,z, fancy) {
     return tmp
 }
 
-function createFlatPlateAt(width, height, color, x,y,z) {
+function createFlatPlateAt(x,y,z,width, height, color) {
     // Check the cache
     var descString = "" + width + "x" + height
     var cachename = 'flatplates'
@@ -362,7 +364,7 @@ function createFlatPlateAt(width, height, color, x,y,z) {
     return tmp
 }
 
-function createTechPlateAt(width, height, color, x,y,z, fancy) {
+function createTechPlateAt(x,y,z, width, height, color, fancy) {
     var cachename = "techplates"
     if (fancy) {
         cachename = "fancy" + cachename
@@ -423,7 +425,7 @@ function createTechPlateAt(width, height, color, x,y,z, fancy) {
 }
 
 // The block cache
-function createBlockAt(width, height, color, x,y,z,fancy) {
+function createBlockAt(x,y,z,width, height, color, fancy) {
     var cachename = "blocks"
     if (fancy) {
         cachename = "fancy" + cachename
@@ -478,7 +480,7 @@ function createBlockAt(width, height, color, x,y,z,fancy) {
 }
 
 
-function createBeamAt(width, height, color, x,y,z) {
+function createBeamAt(x,y,z,width, height, color) {
     // if (((width!=1 && height<2)) || ((height != 1) && width<2)) {
     //     return
     // }
@@ -1009,32 +1011,7 @@ function randomColor() {
     return Math.floor(Math.random()*(LEGO_WHITE+1))
 }
 
-// function createBlockAt(width, height, color, x,y,z, fancy) {
-//     var tmp = createBlock(width, height, color, fancy)
-//     return CGM.translate(tmp, x,y,z)
-// }
-
-// function createBeamAt(width, height, color, x,y,z) {
-//     var tmp = createTechnicBeam(width, height, color)
-//     return CGM.translate(tmp, x,y,z)
-// }
-// function createPlateAt(width, height, color, x,y,z, fancy) {
-//     var tmp = createPlate(width, height, color, fancy)
-//     return CGM.translate(tmp, x,y,z)
-// }
-
-// function createTechPlateAt(width, height, color, x,y,z, fancy) {
-//     var tmp = createTechnicPlate(width, height, color, fancy)
-//     return CGM.translate(tmp, x,y,z)
-// }
-
-// function createAxleAt(x,y,z,length, direction, arot) {
-//     var tmp = createAxle(length, direction,arot)
-//     return CGM.translate(tmp, x,y,z)
-// }
-
-
-function createTowerAt(levels, xp,yp, zp) {
+function createTowerAt(xp,yp,zp, levels) {
     for (var li = 0; li<levels; ++li) {
         var curHeight = (blockHeight(li))
         // var plate1 = createPlateAt(4,4, randomColor(), 0,0, curHeight)
@@ -1042,35 +1019,35 @@ function createTowerAt(levels, xp,yp, zp) {
         // curHeight += plateHeight(1)
         if (0 == (li % 2)) {
             if (Math.random()>0.5) {
-                var block1 = createBlockAt(4,2, randomColor(), 0+xp,0+yp, curHeight+zp,true)
+                var block1 = createBlockAt(0+xp,0+yp, curHeight+zp,4,2, randomColor(), true)
                 if (Math.random()>0.5) {
-                    var block2 = createBlockAt(4,2, randomColor(), 0+xp, dotWidth(2)+yp, curHeight+zp,true)
+                    var block2 = createBlockAt(0+xp, dotWidth(2)+yp, curHeight+zp,4,2, randomColor(), true)
                 }
             } else {
-                var block2 = createBlockAt(4,2, randomColor(), 0+xp, dotWidth(2)+yp, curHeight+zp,true)
+                var block2 = createBlockAt(0+xp, dotWidth(2)+yp, curHeight+zp,4,2, randomColor(), true)
             }
         } else {
             if (Math.random()>0.5) {
-                var block1 = createBlockAt(2,4, randomColor(), 0+xp, 0+yp, curHeight+zp,true)
+                var block1 = createBlockAt(0+xp, 0+yp, curHeight+zp,2,4, randomColor(), true)
                 if (Math.random()>0.5) {
-                    var block2 = createBlockAt(2,4, randomColor(), dotWidth(2)+xp, 0+yp, curHeight+zp,true)
+                    var block2 = createBlockAt(dotWidth(2)+xp, 0+yp, curHeight+zp,2,4, randomColor(), true)
                 }
             } else {
-                var block2 = createBlockAt(2,4, randomColor(), dotWidth(2)+xp, 0+yp, curHeight+zp,true)
+                var block2 = createBlockAt(dotWidth(2)+xp, 0+yp, curHeight+zp,2,4, randomColor(), true)
             }
         }
     }
 }
 
-function createTableAt(width, height, depth, xp, yp, zp) {
+function createTableAt(xp, yp, zp, width, height, depth) {
     for (var lvl = 0; lvl< depth; ++lvl) {
         var curHeight = blockHeight(lvl)+zp
-        var b1 = createBlockAt(2,2, randomColor(), 0+xp,0+yp, curHeight,true)
-        var b2 = createBlockAt(2,2, randomColor(), dotWidth(width-2)+xp,0+yp, curHeight,true)
-        var b3 = createBlockAt(2,2, randomColor(), 0+xp, dotWidth(height-2)+yp, curHeight,true)
-        var b4 = createBlockAt(2,2, randomColor(), dotWidth(width-2)+xp, dotWidth(height-2)+yp, curHeight,true)
+        var b1 = createBlockAt(0+xp,0+yp, curHeight,2,2, randomColor(), true)
+        var b2 = createBlockAt(dotWidth(width-2)+xp,0+yp, curHeight, 2,2, randomColor(), true)
+        var b3 = createBlockAt(0+xp, dotWidth(height-2)+yp, curHeight,2,2, randomColor(), true)
+        var b4 = createBlockAt(dotWidth(width-2)+xp, dotWidth(height-2)+yp, curHeight, 2,2, randomColor(), true)
     }
-    var top = createPlateAt(width, height, randomColor(), 0+xp,0+yp, blockHeight(depth)+zp,true)
+    var top = createPlateAt(0+xp,0+yp, blockHeight(depth)+zp,width, height, randomColor(), true)
 }
 
 function clearPieces() {
@@ -1091,40 +1068,34 @@ function lego_cleanup() {
     }
 }
 function createTower2() {
-    createTableAt(10,10,10, dotWidth(0),dotWidth(0),blockHeight(0) + plateHeight(0))
-    createTableAt(8,8,8, dotWidth(1),dotWidth(1),blockHeight(10) + plateHeight(1))
-    createTableAt(6,6,6, dotWidth(2),dotWidth(2),blockHeight(18) + plateHeight(2))
-    createTableAt(4,4,4, dotWidth(3),dotWidth(3),blockHeight(24) + plateHeight(3))
-    createTableAt(6,6,6, dotWidth(2),dotWidth(2),blockHeight(28) + plateHeight(4))
-    createTableAt(8,8,8, dotWidth(1),dotWidth(1),blockHeight(34) + plateHeight(5))
-    createTableAt(10,10,10, dotWidth(0),dotWidth(0),blockHeight(42) + plateHeight(6))
-    // createTowerAt(20, dotWidth(3), dotWidth(3), blockHeight(28))
+    createTableAt(dotWidth(0),dotWidth(0),blockHeight(0) + plateHeight(0), 10,10,10)
+    createTableAt(dotWidth(1),dotWidth(1),blockHeight(10) + plateHeight(1), 8,8,8)
+    createTableAt(dotWidth(2),dotWidth(2),blockHeight(18) + plateHeight(2), 6,6,6)
+    createTableAt(dotWidth(3),dotWidth(3),blockHeight(24) + plateHeight(3), 4,4,4)
+    createTableAt(dotWidth(2),dotWidth(2),blockHeight(28) + plateHeight(4), 6,6,6)
+    createTableAt(dotWidth(1),dotWidth(1),blockHeight(34) + plateHeight(5), 8,8,8)
+    createTableAt(dotWidth(0),dotWidth(0),blockHeight(42) + plateHeight(6), 10,10,10)
 }
-// createTower2()
-// for (var i = 0;i<10; ++i) {
-//     allPieces.push(createBlockAt(2,2, randomColor(), dotWidth(4), dotWidth(4), blockHeight(28+i) + plateHeight(4)))
-// }
-
 function createTruckBase() {
-    createBeamAt(16,1,LEGO_YELLOW, 0,0,0)
-    createBeamAt(16,1,LEGO_YELLOW, 0,dotWidth(7),0)
+    createBeamAt(0,0,0, 16,1,LEGO_YELLOW)
+    createBeamAt(0,dotWidth(7), 0, 16,1,LEGO_YELLOW)
 
-    createBeamAt(16,1,LEGO_YELLOW, dotWidth(14),dotWidth(1),0)
-    createBeamAt(16,1,LEGO_YELLOW, dotWidth(14),dotWidth(6),0)
+    createBeamAt(dotWidth(14),dotWidth(1),0, 16,1,LEGO_YELLOW)
+    createBeamAt(dotWidth(14),dotWidth(6),0, 16,1,LEGO_YELLOW)
 
-    createTechPlateAt(2,8, LEGO_RED, 0,0,blockHeight(1),true)
-    createTechPlateAt(2,8, LEGO_RED, dotWidth(6),0,blockHeight(1),true)
-    createTechPlateAt(2,8, LEGO_RED, dotWidth(14),0,blockHeight(1),true)
+    createTechPlateAt(0,0,blockHeight(1), 2,8, LEGO_RED, true)
+    createTechPlateAt(dotWidth(6),0,blockHeight(1), 2,8, LEGO_RED, true)
+    createTechPlateAt(dotWidth(14),0,blockHeight(1), 2,8, LEGO_RED, true)
 
-    createTechPlateAt(2,8, LEGO_RED, 0,0,plateHeight(-1),true)
-    createTechPlateAt(2,8, LEGO_RED, dotWidth(6),0,plateHeight(-1),true)
-    createTechPlateAt(2,8, LEGO_RED, dotWidth(14),0,plateHeight(-1),true)
+    createTechPlateAt(0,0,plateHeight(-1),2,8, LEGO_RED, true)
+    createTechPlateAt(dotWidth(6),0,plateHeight(-1),2,8, LEGO_RED, true)
+    createTechPlateAt(dotWidth(14),0,plateHeight(-1),2,8, LEGO_RED, true)
 
-    createTechPlateAt(2,6, LEGO_RED, dotWidth(26),dotWidth(1),plateHeight(-1),true)
-    createTechPlateAt(2,6, LEGO_RED, dotWidth(26),dotWidth(1),blockHeight(1),true)
+    createTechPlateAt(dotWidth(26),dotWidth(1),plateHeight(-1),2,6, LEGO_RED, true)
+    createTechPlateAt(dotWidth(26),dotWidth(1),blockHeight(1),2,6, LEGO_RED, true)
 
-    createBeamAt(8,1,LEGO_YELLOW, 0,0,blockHeight(1)+plateHeight(1))
-    createBeamAt(8,1,LEGO_YELLOW, 0,dotWidth(7),blockHeight(1)+plateHeight(1))
+    createBeamAt(0,0,blockHeight(1)+plateHeight(1), 8,1,LEGO_YELLOW)
+    createBeamAt(0,dotWidth(7),blockHeight(1)+plateHeight(1), 8,1,LEGO_YELLOW)
 
     createAxleAt(axleOffset(),dotWidth(-2),axleHeight(),12, LEGO_AXLE_LEFT)
     createAxleAt(axleOffset() + dotWidth(7),dotWidth(-2),axleHeight(), 12, LEGO_AXLE_LEFT)
@@ -1141,7 +1112,7 @@ function createTruckBase() {
 }
 
 function simpleGears() {
-    beam = createBeamAt(8,1,LEGO_YELLOW, 0,0,0)
+    beam = createBeamAt(0,0,0, 8,1,LEGO_YELLOW)
     a1 = createAxleAt(axleOffset() + dotWidth(0),dotWidth(-1),axleHeight(), 4, LEGO_AXLE_LEFT, 0)
     a2 = createAxleAt(axleOffset() + dotWidth(1),dotWidth(-1),axleHeight(), 4, LEGO_AXLE_LEFT, Math.PI/8)
     a3 = createAxleAt(axleOffset() + dotWidth(2),dotWidth(-1),axleHeight(), 4, LEGO_AXLE_LEFT, 0)
@@ -1157,15 +1128,15 @@ function simpleGears() {
 }
 
 function angledGears() {
-    beam = createBeamAt(8,1,LEGO_YELLOW, 0,0,0)
+    beam = createBeamAt(0,0,0, 8,1,LEGO_YELLOW)
     a1 = createAxleAt(axleOffset() + dotWidth(5),dotWidth(-1),axleHeight(), 4, LEGO_AXLE_LEFT, Math.PI/8)
     g1 = createCrownGearAt(axleOffset() + dotWidth(5),dotWidth(1),axleHeight(), LEGO_AXLE_LEFT, -Math.PI/8)
 
-    p1 = createTechPlateAt(2,6, LEGO_RED, dotWidth(2),0,plateHeight(-1), true)
+    p1 = createTechPlateAt(dotWidth(2),0,plateHeight(-1), 2,6, LEGO_RED, true)
 
-    p2 = createTechPlateAt(2,6, LEGO_RED, dotWidth(2),0,blockHeight(1), true)
+    p2 = createTechPlateAt(dotWidth(2),0,blockHeight(1), 2,6, LEGO_RED, true)
 
-    crossBeam = createBeamAt(1,4,LEGO_YELLOW, dotWidth(3), dotWidth(1), 0)
+    crossBeam = createBeamAt(dotWidth(3), dotWidth(1), 0, 1,4,LEGO_YELLOW)
 
     a2 = createAxleAt(dotWidth(5),axleOffset() + dotWidth(1),axleHeight(), 4, LEGO_AXLE_FRONT, 0)
     g2 = createSmallGearAt(dotWidth(4), axleOffset()+ dotWidth(1), axleHeight(), -LEGO_AXLE_FRONT, 0)
@@ -1202,9 +1173,8 @@ function angledGears() {
 // allPieces.push(createBeamAt(4,1,LEGO_YELLOW, 0,0,blockHeight(5)))
 // allPieces.push(createBeamAt(2,1,LEGO_YELLOW, 0,0,blockHeight(6)))
 // allPieces.push(createBeamAt(2,1,LEGO_YELLOW, 0, dotWidth(18), 0))
-App.clearDocument()
 function usePulleys() {
-    beam = createBeamAt(8,1,LEGO_YELLOW, 0,0,0)
+    beam = createBeamAt(0,0,0, 8,1,LEGO_YELLOW)
     a1 = createAxleAt(axleOffset() + dotWidth(6),dotWidth(-1),axleHeight(), 4, LEGO_AXLE_LEFT, -Math.PI/8)
     g1 = createCrownGearAt(axleOffset() + dotWidth(6),dotWidth(1),axleHeight(), LEGO_AXLE_LEFT, Math.PI/8)
     s1 = createStopperAt(axleOffset() + dotWidth(6),dotWidth(-1),axleHeight(), LEGO_AXLE_LEFT, Math.PI/8)
@@ -1212,11 +1182,12 @@ function usePulleys() {
     c1 = createAxleConnectorAt(axleOffset() + dotWidth(4), dotWidth(0), axleHeight(), LEGO_AXLE_LEFT, 0)
     g2 = createSmallGearAt(axleOffset() + dotWidth(4),dotWidth(1),axleHeight(), LEGO_AXLE_LEFT, 0)
 
-    c2 = createAxleConnectorAt(axleOffset() + dotWidth(3), dotWidth(0), axleHeight(), LEGO_AXLE_LEFT, -Math.PI/8)
-    g3 = createSmallGearAt(axleOffset() + dotWidth(3),dotWidth(1),axleHeight(), LEGO_AXLE_LEFT, -Math.PI/8)
+    // c2 = createAxleConnectorAt(axleOffset() + dotWidth(3), dotWidth(0), axleHeight(), LEGO_AXLE_LEFT, -Math.PI/8)
+    // g3 = createSmallGearAt(axleOffset() + dotWidth(3),dotWidth(1),axleHeight(), LEGO_AXLE_LEFT, -Math.PI/8)
 
-    a3 = createAxleAt(axleOffset() + dotWidth(2),dotWidth(-2),axleHeight(), 4, LEGO_AXLE_LEFT, 0)
-    g4 = createSmallGearAt(axleOffset() + dotWidth(2),dotWidth(1),axleHeight(), LEGO_AXLE_LEFT, 0)
+    a3 = createAxleAt(axleOffset() + dotWidth(2),dotWidth(-2),axleHeight(), 4, LEGO_AXLE_LEFT, Math.PI/8)
+    // g4 = createSmallGearAt(axleOffset() + dotWidth(2),dotWidth(1),axleHeight(), LEGO_AXLE_LEFT, 0)
+    g3 = createCrownGearAt(axleOffset() + dotWidth(2),dotWidth(1),axleHeight(), LEGO_AXLE_LEFT, -Math.PI/8)
 
     p1 = createPulleyAt(axleOffset() + dotWidth(2),-dotWidth(1)/3, axleHeight(),LEGO_AXLE_LEFT, 0)
     p2 = createPulleyAt(axleOffset() + dotWidth(2),-2*dotWidth(1)/3, axleHeight(),LEGO_AXLE_LEFT, 0)
@@ -1227,7 +1198,153 @@ function usePulleys() {
     t1 = createBigTireAt(axleOffset()+dotWidth(2),-dotWidth(2),axleHeight(), LEGO_AXLE_LEFT,0)
 
 }
-usePulleys()
+// usePulleys()
+App.clearDocument()
+function createTank() {
+    createBeamAt(0,0,0, 16,1,LEGO_YELLOW)
+    createBeamAt(0,dotWidth(5),0, 16,1,LEGO_YELLOW)
+
+    createBeamAt(dotWidth(16),0,0, 6,1,LEGO_YELLOW)
+    createBeamAt(dotWidth(16),dotWidth(5), 0,6,1,LEGO_YELLOW)
+
+    createAxleAt(axleOffset()+dotWidth(2),-dotWidth(2),axleHeight(),10, LEGO_AXLE_LEFT)
+    createAxleAt(axleOffset() + dotWidth(10),-dotWidth(2),axleHeight(), 10, LEGO_AXLE_LEFT)
+    createAxleAt(axleOffset() + dotWidth(18),-dotWidth(2),axleHeight(), 10, LEGO_AXLE_LEFT)
+
+    createAxleAt(dotWidth(10),dotWidth(1)+axleOffset(),axleHeight(), 6,LEGO_AXLE_FRONT, -Math.PI/8)
+    createAxleAt(dotWidth(18),dotWidth(1)+axleOffset(),axleHeight(), 6,LEGO_AXLE_FRONT, -Math.PI/8)
+
+    createSmallGearAt(dotWidth(5),dotWidth(1)+axleOffset(),axleHeight(), LEGO_AXLE_FRONT, Math.PI/8)
+    createSmallGearAt(dotWidth(10),dotWidth(1)+axleOffset(),axleHeight(), LEGO_AXLE_FRONT, Math.PI/8)
+
+    createSmallGearAt(dotWidth(13),dotWidth(1)+axleOffset(),axleHeight(), LEGO_AXLE_FRONT, Math.PI/8)
+    createSmallGearAt(dotWidth(18),dotWidth(1)+axleOffset(),axleHeight(), LEGO_AXLE_FRONT, Math.PI/8)
+
+    g1 = createCrownGearAt(axleOffset()+dotWidth(2), dotWidth(1),axleHeight(), LEGO_AXLE_LEFT, 0)
+    g2 = createCrownGearAt(axleOffset() + dotWidth(10), dotWidth(1),axleHeight(), LEGO_AXLE_LEFT, 0)
+    g3 = createCrownGearAt(axleOffset() + dotWidth(18), dotWidth(1),axleHeight(), LEGO_AXLE_LEFT, 0)
+
+    createStopperAt(axleOffset()+dotWidth(2), dotWidth(4),axleHeight(), LEGO_AXLE_LEFT, 0)
+    createStopperAt(axleOffset() + dotWidth(10), dotWidth(4),axleHeight(), LEGO_AXLE_LEFT, 0)
+    createStopperAt(axleOffset() + dotWidth(18), dotWidth(4),axleHeight(), LEGO_AXLE_LEFT, 0)
+
+    
+    p1 = createTechPlateAt(dotWidth(5),0,plateHeight(-1), 2,6, LEGO_RED, true)
+    createBeamAt(dotWidth(5),dotWidth(1),0, 1,4,LEGO_YELLOW)
+    p2 = createTechPlateAt(dotWidth(5),0,blockHeight(1), 2,6, LEGO_RED, true)
+
+    p1 = createTechPlateAt(dotWidth(7),0,plateHeight(-1), 2,6, LEGO_RED, true)
+    createBeamAt(dotWidth(8),dotWidth(1),0, 1,4,LEGO_YELLOW)
+    p2 = createTechPlateAt(dotWidth(7),0,blockHeight(1), 2,6, LEGO_RED, true)
+
+    p1 = createTechPlateAt(dotWidth(13),0,plateHeight(-1), 2,6, LEGO_RED, true)
+    createBeamAt(dotWidth(13),dotWidth(1),0, 1,4,LEGO_YELLOW)
+    p2 = createTechPlateAt(dotWidth(13),0,blockHeight(1), 2,6, LEGO_RED, true)
+
+    p1 = createTechPlateAt(dotWidth(15),0,plateHeight(-1), 2,6, LEGO_RED, true)
+    createBeamAt(dotWidth(16),dotWidth(1),0, 1,4,LEGO_YELLOW)
+    p2 = createTechPlateAt(dotWidth(15),0,blockHeight(1), 2,6, LEGO_RED, true)
+    
+    
+    p1 = createPulleyAt(axleOffset()+dotWidth(2), -dotWidth(1)/3, axleHeight(),LEGO_AXLE_LEFT, 0)
+    p2 = createPulleyAt(axleOffset()+dotWidth(2), -2*dotWidth(1)/3, axleHeight(),LEGO_AXLE_LEFT, 0)
+    p3 = createPulleyAt(axleOffset()+dotWidth(2), -dotWidth(1), axleHeight(),LEGO_AXLE_LEFT, 0)
+
+    p1 = createPulleyAt(axleOffset() + dotWidth(10),-dotWidth(1)/3, axleHeight(),LEGO_AXLE_LEFT, 0)
+    p2 = createPulleyAt(axleOffset() + dotWidth(10),-2*dotWidth(1)/3, axleHeight(),LEGO_AXLE_LEFT, 0)
+    p3 = createPulleyAt(axleOffset() + dotWidth(10),-dotWidth(1), axleHeight(),LEGO_AXLE_LEFT, 0)
+
+    p1 = createPulleyAt(axleOffset() + dotWidth(18),-dotWidth(1)/3, axleHeight(),LEGO_AXLE_LEFT, 0)
+    p2 = createPulleyAt(axleOffset() + dotWidth(18),-2*dotWidth(1)/3, axleHeight(),LEGO_AXLE_LEFT, 0)
+    p3 = createPulleyAt(axleOffset() + dotWidth(18),-dotWidth(1), axleHeight(),LEGO_AXLE_LEFT, 0)
+
+    p1 = createPulleyAt(axleOffset()+dotWidth(2), dotWidth(6), axleHeight(),LEGO_AXLE_LEFT, 0)
+    p2 = createPulleyAt(axleOffset()+dotWidth(2), dotWidth(6)+dotWidth(1)/3, axleHeight(),LEGO_AXLE_LEFT, 0)
+    p3 = createPulleyAt(axleOffset()+dotWidth(2), dotWidth(6)+2*dotWidth(1)/3, axleHeight(),LEGO_AXLE_LEFT, 0)
+
+    p1 = createPulleyAt(axleOffset() + dotWidth(10),dotWidth(6), axleHeight(),LEGO_AXLE_LEFT, 0)
+    p2 = createPulleyAt(axleOffset() + dotWidth(10),dotWidth(6)+dotWidth(1)/3, axleHeight(),LEGO_AXLE_LEFT, 0)
+    p3 = createPulleyAt(axleOffset() + dotWidth(10),dotWidth(6)+2*dotWidth(1)/3, axleHeight(),LEGO_AXLE_LEFT, 0)
+
+    p1 = createPulleyAt(axleOffset() + dotWidth(18),dotWidth(6), axleHeight(),LEGO_AXLE_LEFT, 0)
+    p2 = createPulleyAt(axleOffset() + dotWidth(18),dotWidth(6)+dotWidth(1)/3, axleHeight(),LEGO_AXLE_LEFT, 0)
+    p3 = createPulleyAt(axleOffset() + dotWidth(18),dotWidth(6)+2*dotWidth(1)/3, axleHeight(),LEGO_AXLE_LEFT, 0)
+
+    createConnectorAt(dotWidth(2), -dotWidth(2), axleHeight(), LEGO_AXLE_LEFT, 0)
+    createConnectorAt(dotWidth(4), -dotWidth(2), axleHeight(), LEGO_AXLE_LEFT, 0)
+    createConnectorAt(dotWidth(2), dotWidth(6), axleHeight(), LEGO_AXLE_LEFT, 0)
+    createConnectorAt(dotWidth(4), dotWidth(6), axleHeight(), LEGO_AXLE_LEFT, 0)
+
+    createConnectorAt(dotWidth(10), -dotWidth(2), axleHeight(), LEGO_AXLE_LEFT, 0)
+    createConnectorAt(dotWidth(12), -dotWidth(2), axleHeight(), LEGO_AXLE_LEFT, 0)
+    createConnectorAt(dotWidth(10), dotWidth(6), axleHeight(), LEGO_AXLE_LEFT, 0)
+    createConnectorAt(dotWidth(12), dotWidth(6), axleHeight(), LEGO_AXLE_LEFT, 0)
+
+    createConnectorAt(dotWidth(18), -dotWidth(2), axleHeight(), LEGO_AXLE_LEFT, 0)
+    createConnectorAt(dotWidth(20), -dotWidth(2), axleHeight(), LEGO_AXLE_LEFT, 0)
+    createConnectorAt(dotWidth(18), dotWidth(6), axleHeight(), LEGO_AXLE_LEFT, 0)
+    createConnectorAt(dotWidth(20), dotWidth(6), axleHeight(), LEGO_AXLE_LEFT, 0)
+    t1 = createBigTireAt(axleOffset()+dotWidth(2),-dotWidth(2),axleHeight(), LEGO_AXLE_LEFT,0)
+    t1 = createBigTireAt(axleOffset()+dotWidth(10),-dotWidth(2),axleHeight(), LEGO_AXLE_LEFT,0)
+    t1 = createBigTireAt(axleOffset()+dotWidth(18),-dotWidth(2),axleHeight(), LEGO_AXLE_LEFT,0)
+
+    t1 = createBigTireAt(axleOffset()+dotWidth(2),dotWidth(8),axleHeight(), -LEGO_AXLE_LEFT,0)
+    t1 = createBigTireAt(axleOffset()+dotWidth(10),dotWidth(8),axleHeight(), -LEGO_AXLE_LEFT,0)
+    t1 = createBigTireAt(axleOffset()+dotWidth(18),dotWidth(8),axleHeight(), -LEGO_AXLE_LEFT,0)
+
+    createPlateAt(dotWidth(5), 0, blockHeight(1)+plateHeight(1), 4,1,LEGO_RED, true)
+    createPlateAt(dotWidth(5), 0, blockHeight(1)+plateHeight(2), 4,1,LEGO_RED, true)
+    createPlateAt(dotWidth(5), dotWidth(5), blockHeight(1)+plateHeight(1), 4,1,LEGO_RED, true)
+    createPlateAt(dotWidth(5), dotWidth(5), blockHeight(1)+plateHeight(2), 4,1,LEGO_RED, true)
+    createPlateAt(dotWidth(13), 0, blockHeight(1)+plateHeight(1), 4,1,LEGO_RED, true)
+    createPlateAt(dotWidth(13), 0, blockHeight(1)+plateHeight(2), 4,1,LEGO_RED, true)
+    createPlateAt(dotWidth(13), dotWidth(5), blockHeight(1)+plateHeight(1), 4,1,LEGO_RED, true)
+    createPlateAt(dotWidth(13), dotWidth(5), blockHeight(1)+plateHeight(2), 4,1,LEGO_RED, true)
+
+    createBeamAt(0,0,blockHeight(1), 1,6,LEGO_YELLOW)
+    createBeamAt(dotWidth(21),0,blockHeight(1), 1,6,LEGO_YELLOW)
+
+    createBeamAt(0,0,blockHeight(2), 16,1,LEGO_YELLOW)
+    createBeamAt(0,dotWidth(5),blockHeight(2), 16,1,LEGO_YELLOW)
+
+    createBeamAt(dotWidth(16),0,blockHeight(2), 6,1,LEGO_YELLOW)
+    createBeamAt(dotWidth(16),dotWidth(5), blockHeight(2),6,1,LEGO_YELLOW)
+
+    createBeamAt(0,dotWidth(1),blockHeight(2), 1,4,LEGO_YELLOW)
+    createBeamAt(dotWidth(21),dotWidth(1),blockHeight(2), 1,4,LEGO_YELLOW)
+
+}
+createTank()
+    // createBeamAt(16,1,LEGO_YELLOW, dotWidth(14),dotWidth(1),0)
+    // createBeamAt(16,1,LEGO_YELLOW, dotWidth(14),dotWidth(6),0)
+
+    // createTechPlateAt(2,8, LEGO_RED, 0,0,blockHeight(1),true)
+    // createTechPlateAt(2,8, LEGO_RED, dotWidth(6),0,blockHeight(1),true)
+    // createTechPlateAt(2,8, LEGO_RED, dotWidth(14),0,blockHeight(1),true)
+
+    // createTechPlateAt(2,8, LEGO_RED, 0,0,plateHeight(-1),true)
+    // createTechPlateAt(2,8, LEGO_RED, dotWidth(6),0,plateHeight(-1),true)
+    // createTechPlateAt(2,8, LEGO_RED, dotWidth(14),0,plateHeight(-1),true)
+
+    // createTechPlateAt(2,6, LEGO_RED, dotWidth(26),dotWidth(1),plateHeight(-1),true)
+    // createTechPlateAt(2,6, LEGO_RED, dotWidth(26),dotWidth(1),blockHeight(1),true)
+
+    // createBeamAt(8,1,LEGO_YELLOW, 0,0,blockHeight(1)+plateHeight(1))
+    // createBeamAt(8,1,LEGO_YELLOW, 0,dotWidth(7),blockHeight(1)+plateHeight(1))
+
+    // createAxleAt(axleOffset(),dotWidth(-2),axleHeight(),8, LEGO_AXLE_LEFT)
+    // createAxleAt(axleOffset() + dotWidth(7),dotWidth(-2),axleHeight(), 8, LEGO_AXLE_LEFT)
+    // createAxleAt(axleOffset() + dotWidth(26),dotWidth(-2),axleHeight(), 8, LEGO_AXLE_LEFT)
+
+    // t1 = createBigTireAt(axleOffset() ,0,axleHeight(), -LEGO_AXLE_LEFT,0)
+    // t2 = createBigTireAt(axleOffset(),dotWidth(4),axleHeight(), LEGO_AXLE_LEFT,0)
+
+    // t3 = createBigTireAt(axleOffset() + dotWidth(7),0,axleHeight(), -LEGO_AXLE_LEFT,0)
+    // t4 = createBigTireAt(axleOffset() + dotWidth(7),dotWidth(4),axleHeight(), LEGO_AXLE_LEFT,0)
+
+    // t5 = createBigTireAt(axleOffset() + dotWidth(15),dotWidth(0),axleHeight(), -LEGO_AXLE_LEFT,0)
+    // t6 = createBigTireAt(axleOffset() + dotWidth(15),dotWidth(4),axleHeight(), LEGO_AXLE_LEFT,0)
+
 
 lego_cleanup()
 // ཧྐྵྨླྺྼྻྂ
