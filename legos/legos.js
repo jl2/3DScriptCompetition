@@ -1120,140 +1120,221 @@ function usePulleys() {
 
 }
 // usePulleys()
+
 App.clearDocument()
 function createTank() {
-    createBeamAt(0,0,0, 16,1,LEGO_YELLOW)
-    createBeamAt(0,dotWidth(5),0, 16,1,LEGO_YELLOW)
+    var truck = new Array()
 
-    createBeamAt(dotWidth(16),0,0, 6,1,LEGO_YELLOW)
-    createBeamAt(dotWidth(16),dotWidth(5), 0,6,1,LEGO_YELLOW)
+    truck.push(createBeamAt(0,0,0, 16,1,LEGO_YELLOW))
+    truck.push(createBeamAt(0,dotWidth(5),0, 16,1,LEGO_YELLOW))
 
-    createAxleAt(axleOffset()+dotWidth(2),-dotWidth(2),axleHeight(),10, LEGO_AXLE_LEFT)
-    createAxleAt(axleOffset() + dotWidth(10),-dotWidth(2),axleHeight(), 10, LEGO_AXLE_LEFT)
-    createAxleAt(axleOffset() + dotWidth(18),-dotWidth(2),axleHeight(), 10, LEGO_AXLE_LEFT)
+    truck.push(createBeamAt(dotWidth(16),0,0, 6,1,LEGO_YELLOW))
+    truck.push(createBeamAt(dotWidth(16),dotWidth(5), 0,6,1,LEGO_YELLOW))
 
-    createAxleAt(dotWidth(10),dotWidth(1)+axleOffset(),axleHeight(), 6,LEGO_AXLE_FRONT, -Math.PI/8)
-    createAxleAt(dotWidth(18),dotWidth(1)+axleOffset(),axleHeight(), 6,LEGO_AXLE_FRONT, -Math.PI/8)
+    truck.push(createAxleAt(axleOffset()+dotWidth(2),-dotWidth(2),axleHeight(),10, LEGO_AXLE_LEFT))
+    truck.push(createAxleAt(axleOffset() + dotWidth(10),-dotWidth(2),axleHeight(), 10, LEGO_AXLE_LEFT))
+    truck.push(createAxleAt(axleOffset() + dotWidth(18),-dotWidth(2),axleHeight(), 10, LEGO_AXLE_LEFT))
 
-    createSmallGearAt(dotWidth(5),dotWidth(1)+axleOffset(),axleHeight(), LEGO_AXLE_FRONT, Math.PI/8)
-    createSmallGearAt(dotWidth(10),dotWidth(1)+axleOffset(),axleHeight(), LEGO_AXLE_FRONT, Math.PI/8)
+    truck.push(createAxleAt(dotWidth(10),dotWidth(1)+axleOffset(),axleHeight(), 6,LEGO_AXLE_FRONT, -Math.PI/8))
+    truck.push(createAxleAt(dotWidth(18),dotWidth(1)+axleOffset(),axleHeight(), 6,LEGO_AXLE_FRONT, -Math.PI/8))
 
-    createSmallGearAt(dotWidth(13),dotWidth(1)+axleOffset(),axleHeight(), LEGO_AXLE_FRONT, Math.PI/8)
-    createSmallGearAt(dotWidth(18),dotWidth(1)+axleOffset(),axleHeight(), LEGO_AXLE_FRONT, Math.PI/8)
+    truck.push(createSmallGearAt(dotWidth(5),dotWidth(1)+axleOffset(),axleHeight(), LEGO_AXLE_FRONT, Math.PI/8))
+    truck.push(createSmallGearAt(dotWidth(10),dotWidth(1)+axleOffset(),axleHeight(), LEGO_AXLE_FRONT, Math.PI/8))
 
-    g1 = createCrownGearAt(axleOffset()+dotWidth(2), dotWidth(1),axleHeight(), LEGO_AXLE_LEFT, 0)
-    g2 = createCrownGearAt(axleOffset() + dotWidth(10), dotWidth(1),axleHeight(), LEGO_AXLE_LEFT, 0)
-    g3 = createCrownGearAt(axleOffset() + dotWidth(18), dotWidth(1),axleHeight(), LEGO_AXLE_LEFT, 0)
+    truck.push(createSmallGearAt(dotWidth(13),dotWidth(1)+axleOffset(),axleHeight(), LEGO_AXLE_FRONT, Math.PI/8))
+    truck.push(createSmallGearAt(dotWidth(18),dotWidth(1)+axleOffset(),axleHeight(), LEGO_AXLE_FRONT, Math.PI/8))
 
-    createStopperAt(axleOffset()+dotWidth(2), dotWidth(4),axleHeight(), LEGO_AXLE_LEFT, 0)
-    createStopperAt(axleOffset() + dotWidth(10), dotWidth(4),axleHeight(), LEGO_AXLE_LEFT, 0)
-    createStopperAt(axleOffset() + dotWidth(18), dotWidth(4),axleHeight(), LEGO_AXLE_LEFT, 0)
+    truck.push(createCrownGearAt(axleOffset()+dotWidth(2), dotWidth(1),axleHeight(), LEGO_AXLE_LEFT, 0))
+    truck.push(createCrownGearAt(axleOffset() + dotWidth(10), dotWidth(1),axleHeight(), LEGO_AXLE_LEFT, 0))
+    truck.push(createCrownGearAt(axleOffset() + dotWidth(18), dotWidth(1),axleHeight(), LEGO_AXLE_LEFT, 0))
+
+    truck.push(createStopperAt(axleOffset()+dotWidth(2), dotWidth(4),axleHeight(), LEGO_AXLE_LEFT, 0))
+    truck.push(createStopperAt(axleOffset() + dotWidth(10), dotWidth(4),axleHeight(), LEGO_AXLE_LEFT, 0))
+    truck.push(createStopperAt(axleOffset() + dotWidth(18), dotWidth(4),axleHeight(), LEGO_AXLE_LEFT, 0))
 
     
-    p1 = createTechPlateAt(dotWidth(5),0,plateHeight(-1), 2,6, LEGO_RED, true)
-    createBeamAt(dotWidth(5),dotWidth(1),0, 1,4,LEGO_YELLOW)
-    p2 = createTechPlateAt(dotWidth(5),0,blockHeight(1), 2,6, LEGO_RED, true)
+    truck.push(createTechPlateAt(dotWidth(5),0,plateHeight(-1), 2,6, LEGO_RED, true))
+    truck.push(createBeamAt(dotWidth(5),dotWidth(1),0, 1,4,LEGO_YELLOW))
+    truck.push(createTechPlateAt(dotWidth(5),0,blockHeight(1), 2,6, LEGO_RED, true))
 
-    p1 = createTechPlateAt(dotWidth(7),0,plateHeight(-1), 2,6, LEGO_RED, true)
-    createBeamAt(dotWidth(8),dotWidth(1),0, 1,4,LEGO_YELLOW)
-    p2 = createTechPlateAt(dotWidth(7),0,blockHeight(1), 2,6, LEGO_RED, true)
+    truck.push(createTechPlateAt(dotWidth(7),0,plateHeight(-1), 2,6, LEGO_RED, true))
+    truck.push(createBeamAt(dotWidth(8),dotWidth(1),0, 1,4,LEGO_YELLOW))
+    truck.push(createTechPlateAt(dotWidth(7),0,blockHeight(1), 2,6, LEGO_RED, true))
 
-    p1 = createTechPlateAt(dotWidth(13),0,plateHeight(-1), 2,6, LEGO_RED, true)
-    createBeamAt(dotWidth(13),dotWidth(1),0, 1,4,LEGO_YELLOW)
-    p2 = createTechPlateAt(dotWidth(13),0,blockHeight(1), 2,6, LEGO_RED, true)
+    truck.push(createTechPlateAt(dotWidth(13),0,plateHeight(-1), 2,6, LEGO_RED, true))
+    truck.push(createBeamAt(dotWidth(13),dotWidth(1),0, 1,4,LEGO_YELLOW))
+    truck.push(createTechPlateAt(dotWidth(13),0,blockHeight(1), 2,6, LEGO_RED, true))
 
-    p1 = createTechPlateAt(dotWidth(15),0,plateHeight(-1), 2,6, LEGO_RED, true)
-    createBeamAt(dotWidth(16),dotWidth(1),0, 1,4,LEGO_YELLOW)
-    p2 = createTechPlateAt(dotWidth(15),0,blockHeight(1), 2,6, LEGO_RED, true)
+    truck.push(createTechPlateAt(dotWidth(15),0,plateHeight(-1), 2,6, LEGO_RED, true))
+    truck.push(createBeamAt(dotWidth(16),dotWidth(1),0, 1,4,LEGO_YELLOW))
+    truck.push(createTechPlateAt(dotWidth(15),0,blockHeight(1), 2,6, LEGO_RED, true))
     
     
-    p1 = createPulleyAt(axleOffset()+dotWidth(2), -dotWidth(1)/3, axleHeight(),LEGO_AXLE_LEFT, 0)
-    p2 = createPulleyAt(axleOffset()+dotWidth(2), -2*dotWidth(1)/3, axleHeight(),LEGO_AXLE_LEFT, 0)
-    p3 = createPulleyAt(axleOffset()+dotWidth(2), -dotWidth(1), axleHeight(),LEGO_AXLE_LEFT, 0)
+    truck.push(createPulleyAt(axleOffset()+dotWidth(2), -dotWidth(1)/3, axleHeight(),LEGO_AXLE_LEFT, 0))
+    truck.push(createPulleyAt(axleOffset()+dotWidth(2), -2*dotWidth(1)/3, axleHeight(),LEGO_AXLE_LEFT, 0))
+    truck.push(createPulleyAt(axleOffset()+dotWidth(2), -dotWidth(1), axleHeight(),LEGO_AXLE_LEFT, 0))
 
-    p1 = createPulleyAt(axleOffset() + dotWidth(10),-dotWidth(1)/3, axleHeight(),LEGO_AXLE_LEFT, 0)
-    p2 = createPulleyAt(axleOffset() + dotWidth(10),-2*dotWidth(1)/3, axleHeight(),LEGO_AXLE_LEFT, 0)
-    p3 = createPulleyAt(axleOffset() + dotWidth(10),-dotWidth(1), axleHeight(),LEGO_AXLE_LEFT, 0)
+    truck.push(createPulleyAt(axleOffset() + dotWidth(10),-dotWidth(1)/3, axleHeight(),LEGO_AXLE_LEFT, 0))
+    truck.push(createPulleyAt(axleOffset() + dotWidth(10),-2*dotWidth(1)/3, axleHeight(),LEGO_AXLE_LEFT, 0))
+    truck.push(createPulleyAt(axleOffset() + dotWidth(10),-dotWidth(1), axleHeight(),LEGO_AXLE_LEFT, 0))
 
-    p1 = createPulleyAt(axleOffset() + dotWidth(18),-dotWidth(1)/3, axleHeight(),LEGO_AXLE_LEFT, 0)
-    p2 = createPulleyAt(axleOffset() + dotWidth(18),-2*dotWidth(1)/3, axleHeight(),LEGO_AXLE_LEFT, 0)
-    p3 = createPulleyAt(axleOffset() + dotWidth(18),-dotWidth(1), axleHeight(),LEGO_AXLE_LEFT, 0)
+    truck.push(createPulleyAt(axleOffset() + dotWidth(18),-dotWidth(1)/3, axleHeight(),LEGO_AXLE_LEFT, 0))
+    truck.push(createPulleyAt(axleOffset() + dotWidth(18),-2*dotWidth(1)/3, axleHeight(),LEGO_AXLE_LEFT, 0))
+    truck.push(createPulleyAt(axleOffset() + dotWidth(18),-dotWidth(1), axleHeight(),LEGO_AXLE_LEFT, 0))
 
-    p1 = createPulleyAt(axleOffset()+dotWidth(2), dotWidth(6), axleHeight(),LEGO_AXLE_LEFT, 0)
-    p2 = createPulleyAt(axleOffset()+dotWidth(2), dotWidth(6)+dotWidth(1)/3, axleHeight(),LEGO_AXLE_LEFT, 0)
-    p3 = createPulleyAt(axleOffset()+dotWidth(2), dotWidth(6)+2*dotWidth(1)/3, axleHeight(),LEGO_AXLE_LEFT, 0)
+    truck.push(createPulleyAt(axleOffset()+dotWidth(2), dotWidth(6), axleHeight(),LEGO_AXLE_LEFT, 0))
+    truck.push(createPulleyAt(axleOffset()+dotWidth(2), dotWidth(6)+dotWidth(1)/3, axleHeight(),LEGO_AXLE_LEFT, 0))
+    truck.push(createPulleyAt(axleOffset()+dotWidth(2), dotWidth(6)+2*dotWidth(1)/3, axleHeight(),LEGO_AXLE_LEFT, 0))
 
-    p1 = createPulleyAt(axleOffset() + dotWidth(10),dotWidth(6), axleHeight(),LEGO_AXLE_LEFT, 0)
-    p2 = createPulleyAt(axleOffset() + dotWidth(10),dotWidth(6)+dotWidth(1)/3, axleHeight(),LEGO_AXLE_LEFT, 0)
-    p3 = createPulleyAt(axleOffset() + dotWidth(10),dotWidth(6)+2*dotWidth(1)/3, axleHeight(),LEGO_AXLE_LEFT, 0)
+    truck.push(createPulleyAt(axleOffset() + dotWidth(10),dotWidth(6), axleHeight(),LEGO_AXLE_LEFT, 0))
+    truck.push(createPulleyAt(axleOffset() + dotWidth(10),dotWidth(6)+dotWidth(1)/3, axleHeight(),LEGO_AXLE_LEFT, 0))
+    truck.push(createPulleyAt(axleOffset() + dotWidth(10),dotWidth(6)+2*dotWidth(1)/3, axleHeight(),LEGO_AXLE_LEFT, 0))
 
-    p1 = createPulleyAt(axleOffset() + dotWidth(18),dotWidth(6), axleHeight(),LEGO_AXLE_LEFT, 0)
-    p2 = createPulleyAt(axleOffset() + dotWidth(18),dotWidth(6)+dotWidth(1)/3, axleHeight(),LEGO_AXLE_LEFT, 0)
-    p3 = createPulleyAt(axleOffset() + dotWidth(18),dotWidth(6)+2*dotWidth(1)/3, axleHeight(),LEGO_AXLE_LEFT, 0)
+    truck.push(createPulleyAt(axleOffset() + dotWidth(18),dotWidth(6), axleHeight(),LEGO_AXLE_LEFT, 0))
+    truck.push(createPulleyAt(axleOffset() + dotWidth(18),dotWidth(6)+dotWidth(1)/3, axleHeight(),LEGO_AXLE_LEFT, 0))
+    truck.push(createPulleyAt(axleOffset() + dotWidth(18),dotWidth(6)+2*dotWidth(1)/3, axleHeight(),LEGO_AXLE_LEFT, 0))
 
-    createConnectorAt(dotWidth(2), -dotWidth(2), axleHeight(), LEGO_AXLE_LEFT, 0)
-    createConnectorAt(dotWidth(4), -dotWidth(2), axleHeight(), LEGO_AXLE_LEFT, 0)
-    createConnectorAt(dotWidth(2), dotWidth(6), axleHeight(), LEGO_AXLE_LEFT, 0)
-    createConnectorAt(dotWidth(4), dotWidth(6), axleHeight(), LEGO_AXLE_LEFT, 0)
+    truck.push(createConnectorAt(dotWidth(2), -dotWidth(2), axleHeight(), LEGO_AXLE_LEFT, 0))
+    truck.push(createConnectorAt(dotWidth(4), -dotWidth(2), axleHeight(), LEGO_AXLE_LEFT, 0))
+    truck.push(createConnectorAt(dotWidth(2), dotWidth(6), axleHeight(), LEGO_AXLE_LEFT, 0))
+    truck.push(createConnectorAt(dotWidth(4), dotWidth(6), axleHeight(), LEGO_AXLE_LEFT, 0))
 
-    createConnectorAt(dotWidth(10), -dotWidth(2), axleHeight(), LEGO_AXLE_LEFT, 0)
-    createConnectorAt(dotWidth(12), -dotWidth(2), axleHeight(), LEGO_AXLE_LEFT, 0)
-    createConnectorAt(dotWidth(10), dotWidth(6), axleHeight(), LEGO_AXLE_LEFT, 0)
-    createConnectorAt(dotWidth(12), dotWidth(6), axleHeight(), LEGO_AXLE_LEFT, 0)
+    truck.push(createConnectorAt(dotWidth(10), -dotWidth(2), axleHeight(), LEGO_AXLE_LEFT, 0))
+    truck.push(createConnectorAt(dotWidth(12), -dotWidth(2), axleHeight(), LEGO_AXLE_LEFT, 0))
+    truck.push(createConnectorAt(dotWidth(10), dotWidth(6), axleHeight(), LEGO_AXLE_LEFT, 0))
+    truck.push(createConnectorAt(dotWidth(12), dotWidth(6), axleHeight(), LEGO_AXLE_LEFT, 0))
 
-    createConnectorAt(dotWidth(18), -dotWidth(2), axleHeight(), LEGO_AXLE_LEFT, 0)
-    createConnectorAt(dotWidth(20), -dotWidth(2), axleHeight(), LEGO_AXLE_LEFT, 0)
-    createConnectorAt(dotWidth(18), dotWidth(6), axleHeight(), LEGO_AXLE_LEFT, 0)
-    createConnectorAt(dotWidth(20), dotWidth(6), axleHeight(), LEGO_AXLE_LEFT, 0)
-    t1 = createBigTireAt(axleOffset()+dotWidth(2),-dotWidth(2),axleHeight(), LEGO_AXLE_LEFT,0)
-    t1 = createBigTireAt(axleOffset()+dotWidth(10),-dotWidth(2),axleHeight(), LEGO_AXLE_LEFT,0)
-    t1 = createBigTireAt(axleOffset()+dotWidth(18),-dotWidth(2),axleHeight(), LEGO_AXLE_LEFT,0)
+    truck.push(createConnectorAt(dotWidth(18), -dotWidth(2), axleHeight(), LEGO_AXLE_LEFT, 0))
+    truck.push(createConnectorAt(dotWidth(20), -dotWidth(2), axleHeight(), LEGO_AXLE_LEFT, 0))
+    truck.push(createConnectorAt(dotWidth(18), dotWidth(6), axleHeight(), LEGO_AXLE_LEFT, 0))
+    truck.push(createConnectorAt(dotWidth(20), dotWidth(6), axleHeight(), LEGO_AXLE_LEFT, 0))
+    truck.push(createBigTireAt(axleOffset()+dotWidth(2),-dotWidth(2),axleHeight(), LEGO_AXLE_LEFT,0))
+    truck.push(createBigTireAt(axleOffset()+dotWidth(10),-dotWidth(2),axleHeight(), LEGO_AXLE_LEFT,0))
+    truck.push(createBigTireAt(axleOffset()+dotWidth(18),-dotWidth(2),axleHeight(), LEGO_AXLE_LEFT,0))
 
-    t1 = createBigTireAt(axleOffset()+dotWidth(2),dotWidth(8),axleHeight(), -LEGO_AXLE_LEFT,0)
-    t1 = createBigTireAt(axleOffset()+dotWidth(10),dotWidth(8),axleHeight(), -LEGO_AXLE_LEFT,0)
-    t1 = createBigTireAt(axleOffset()+dotWidth(18),dotWidth(8),axleHeight(), -LEGO_AXLE_LEFT,0)
+    truck.push(createBigTireAt(axleOffset()+dotWidth(2),dotWidth(8),axleHeight(), -LEGO_AXLE_LEFT,0))
+    truck.push(createBigTireAt(axleOffset()+dotWidth(10),dotWidth(8),axleHeight(), -LEGO_AXLE_LEFT,0))
+    truck.push(createBigTireAt(axleOffset()+dotWidth(18),dotWidth(8),axleHeight(), -LEGO_AXLE_LEFT,0))
 
-    createPlateAt(dotWidth(5), 0, blockHeight(1)+plateHeight(1), 4,1,LEGO_RED, true)
-    createPlateAt(dotWidth(5), 0, blockHeight(1)+plateHeight(2), 4,1,LEGO_RED, true)
-    createPlateAt(dotWidth(5), dotWidth(5), blockHeight(1)+plateHeight(1), 4,1,LEGO_RED, true)
-    createPlateAt(dotWidth(5), dotWidth(5), blockHeight(1)+plateHeight(2), 4,1,LEGO_RED, true)
-    createPlateAt(dotWidth(13), 0, blockHeight(1)+plateHeight(1), 4,1,LEGO_RED, true)
-    createPlateAt(dotWidth(13), 0, blockHeight(1)+plateHeight(2), 4,1,LEGO_RED, true)
-    createPlateAt(dotWidth(13), dotWidth(5), blockHeight(1)+plateHeight(1), 4,1,LEGO_RED, true)
-    createPlateAt(dotWidth(13), dotWidth(5), blockHeight(1)+plateHeight(2), 4,1,LEGO_RED, true)
+    truck.push(createPlateAt(dotWidth(5), 0, blockHeight(1)+plateHeight(1), 4,1,LEGO_RED, true))
+    truck.push(createPlateAt(dotWidth(5), 0, blockHeight(1)+plateHeight(2), 4,1,LEGO_RED, true))
+    truck.push(createPlateAt(dotWidth(5), dotWidth(5), blockHeight(1)+plateHeight(1), 4,1,LEGO_RED, true))
+    truck.push(createPlateAt(dotWidth(5), dotWidth(5), blockHeight(1)+plateHeight(2), 4,1,LEGO_RED, true))
+    truck.push(createPlateAt(dotWidth(13), 0, blockHeight(1)+plateHeight(1), 4,1,LEGO_RED, true))
+    truck.push(createPlateAt(dotWidth(13), 0, blockHeight(1)+plateHeight(2), 4,1,LEGO_RED, true))
+    truck.push(createPlateAt(dotWidth(13), dotWidth(5), blockHeight(1)+plateHeight(1), 4,1,LEGO_RED, true))
+    truck.push(createPlateAt(dotWidth(13), dotWidth(5), blockHeight(1)+plateHeight(2), 4,1,LEGO_RED, true))
 
-    createBeamAt(0,0,blockHeight(1), 1,6,LEGO_YELLOW)
-    createBeamAt(dotWidth(21),0,blockHeight(1), 1,6,LEGO_YELLOW)
+    truck.push(createBeamAt(0,0,blockHeight(1), 1,6,LEGO_YELLOW))
+    truck.push(createBeamAt(dotWidth(21),0,blockHeight(1), 1,6,LEGO_YELLOW))
 
-    createBeamAt(0,0,blockHeight(2), 16,1,LEGO_YELLOW)
-    createBeamAt(0,dotWidth(5),blockHeight(2), 16,1,LEGO_YELLOW)
+    truck.push(createBeamAt(0,0,blockHeight(2), 16,1,LEGO_YELLOW))
+    truck.push(createBeamAt(0,dotWidth(5),blockHeight(2), 16,1,LEGO_YELLOW))
 
-    createBeamAt(dotWidth(16),0,blockHeight(2), 6,1,LEGO_YELLOW)
-    createBeamAt(dotWidth(16),dotWidth(5), blockHeight(2),6,1,LEGO_YELLOW)
+    truck.push(createBeamAt(dotWidth(16),0,blockHeight(2), 6,1,LEGO_YELLOW))
+    truck.push(createBeamAt(dotWidth(16),dotWidth(5), blockHeight(2),6,1,LEGO_YELLOW))
 
-    createBeamAt(0,dotWidth(1),blockHeight(2), 1,4,LEGO_YELLOW)
-    createBeamAt(dotWidth(21),dotWidth(1),blockHeight(2), 1,4,LEGO_YELLOW)
+    truck.push(createBeamAt(0,dotWidth(1),blockHeight(2), 1,4,LEGO_YELLOW))
+    truck.push(createBeamAt(dotWidth(21),dotWidth(1),blockHeight(2), 1,4,LEGO_YELLOW))
 
-    createBeamAt(0,dotWidth(1),0, 1,4,LEGO_YELLOW)
-    createBeamAt(dotWidth(21),dotWidth(1),0, 1,4,LEGO_YELLOW)
+    truck.push(createBeamAt(0,dotWidth(1),0, 1,4,LEGO_YELLOW))
+    truck.push(createBeamAt(dotWidth(21),dotWidth(1),0, 1,4,LEGO_YELLOW))
 
-    createPlateAt(0, 0, -plateHeight(1), 1,6,LEGO_RED, true)
-    createPlateAt(dotWidth(21), 0, -plateHeight(1), 1,6,LEGO_RED, true)
+    truck.push(createPlateAt(0, 0, -plateHeight(1), 1,6,LEGO_RED, true))
+    truck.push(createPlateAt(dotWidth(21), 0, -plateHeight(1), 1,6,LEGO_RED, true))
 
-    createBeamAt(0,-dotWidth(2),0, 1,10,LEGO_BLACK)
-    createBeamAt(dotWidth(21),-dotWidth(2),0, 1,10,LEGO_BLACK)
+    // truck.push(createBeamAt(0,-dotWidth(2),0, 1,10,LEGO_BLACK))
+    // truck.push(createBeamAt(dotWidth(21),-dotWidth(2),0, 1,10,LEGO_BLACK))
 
-    createBeamAt(0,-dotWidth(2),blockHeight(3), 1,10,LEGO_BLACK)
-    createBeamAt(dotWidth(13),-dotWidth(2),blockHeight(3), 1,10,LEGO_BLACK)
-    createBeamAt(dotWidth(8),-dotWidth(2),blockHeight(3), 1,10,LEGO_BLACK)
-    createBeamAt(dotWidth(5),-dotWidth(2),blockHeight(3), 1,10,LEGO_BLACK)
+    truck.push(createBeamAt(0,-dotWidth(2),blockHeight(3), 1,10,LEGO_BLACK))
+    truck.push(createBeamAt(dotWidth(13),-dotWidth(2),blockHeight(3), 1,10,LEGO_BLACK))
+    truck.push(createBeamAt(dotWidth(8),-dotWidth(2),blockHeight(3), 1,10,LEGO_BLACK))
+    truck.push(createBeamAt(dotWidth(5),-dotWidth(2),blockHeight(3), 1,10,LEGO_BLACK))
 
-    createBeamAt(dotWidth(21),0,blockHeight(3), 1,6,LEGO_BLACK)
-    createBeamAt(dotWidth(16),0,blockHeight(3), 1,6,LEGO_BLACK)
+    truck.push(createBeamAt(dotWidth(21),0,blockHeight(3), 1,6,LEGO_BLACK))
+    truck.push(createBeamAt(dotWidth(16),0,blockHeight(3), 1,6,LEGO_BLACK))
     
-    createBeamAt(-dotWidth(1),-dotWidth(2),blockHeight(4), 16,1,LEGO_BLACK)
-    createBeamAt(-dotWidth(1),dotWidth(7),blockHeight(4), 16,1,LEGO_BLACK)
+    truck.push(createBeamAt(-dotWidth(1),-dotWidth(2),blockHeight(4), 16,1,LEGO_BLACK))
+    truck.push(createBeamAt(-dotWidth(1),dotWidth(7),blockHeight(4), 16,1,LEGO_BLACK))
+
+    truck.push(createBeamAt(dotWidth(13),0,blockHeight(4), 10,1,LEGO_BLACK))
+    truck.push(createBeamAt(dotWidth(13),dotWidth(5),blockHeight(4), 10,1,LEGO_BLACK))
+
+    tb = createBeamAt(dotWidth(17),-dotWidth(1),blockHeight(4), 6,1,LEGO_BLACK)
+    tb = CGM.rotate(tb, cp(dotWidth(23)-axleOffset(), -dotWidth(1), blockHeight(4)+axleHeight()), left, Math.PI/2)
+    truck.push(tb)
+
+    tb = createBeamAt(dotWidth(17),dotWidth(6),blockHeight(4), 6,1,LEGO_BLACK)
+    tb = CGM.rotate(tb, cp(dotWidth(23)-axleOffset(), dotWidth(6), blockHeight(4)+axleHeight()), left, Math.PI/2)
+    truck.push(tb)
+
+    truck.push(createConnectorAt(dotWidth(22), -dotWidth(1), blockHeight(4)+axleHeight(), LEGO_AXLE_LEFT, 0))
+    truck.push(createConnectorAt(dotWidth(22), dotWidth(5), blockHeight(4)+axleHeight(), LEGO_AXLE_LEFT, 0))
+
+    truck.push(createConnectorAt(dotWidth(22), -dotWidth(1), dotWidth(4)+blockHeight(4)+axleHeight(), LEGO_AXLE_LEFT, 0))
+    truck.push(createConnectorAt(dotWidth(22), dotWidth(5), dotWidth(4)+blockHeight(4)+axleHeight(), LEGO_AXLE_LEFT, 0))
+
+    truck.push(createBeamAt(dotWidth(13),0,dotWidth(4)+blockHeight(4), 10,1,LEGO_BLACK))
+    truck.push(createBeamAt(dotWidth(13),dotWidth(5),dotWidth(4)+blockHeight(4), 10,1,LEGO_BLACK))
+
+    tb = createBeamAt(dotWidth(12),-dotWidth(1),blockHeight(4), 6,1,LEGO_BLACK)
+    tb = CGM.rotate(tb, cp(dotWidth(18)-axleOffset(), -dotWidth(1), blockHeight(4)+axleHeight()), left, Math.PI/2)
+    truck.push(tb)
+
+    tb = createBeamAt(dotWidth(12),dotWidth(6),blockHeight(4), 6,1,LEGO_BLACK)
+    tb = CGM.rotate(tb, cp(dotWidth(18)-axleOffset(), dotWidth(6), blockHeight(4)+axleHeight()), left, Math.PI/2)
+    truck.push(tb)
+
+    truck.push(createConnectorAt(dotWidth(17), -dotWidth(1), blockHeight(4)+axleHeight(), LEGO_AXLE_LEFT, 0))
+    truck.push(createConnectorAt(dotWidth(17), dotWidth(5), blockHeight(4)+axleHeight(), LEGO_AXLE_LEFT, 0))
+
+    truck.push(createConnectorAt(dotWidth(17), -dotWidth(1), dotWidth(4)+blockHeight(4)+axleHeight(), LEGO_AXLE_LEFT, 0))
+    truck.push(createConnectorAt(dotWidth(17), dotWidth(5), dotWidth(4)+blockHeight(4)+axleHeight(), LEGO_AXLE_LEFT, 0))
+
+    tb = createBeamAt(-dotWidth(1),-dotWidth(3),blockHeight(4), 12,1,LEGO_BLACK)
+    tb = CGM.rotate(tb, cp(-dotWidth(1)+axleOffset(), -dotWidth(3), blockHeight(4)+axleHeight()), left, -Math.PI/2)
+    truck.push(tb)
+
+    tb = createBeamAt(-dotWidth(1),dotWidth(8),blockHeight(4), 12,1,LEGO_BLACK)
+    tb = CGM.rotate(tb, cp(-dotWidth(1)+axleOffset(), dotWidth(8), blockHeight(4)+axleHeight()), left, -Math.PI/2)
+    truck.push(tb)
+
+    truck.push(createConnectorAt(0, -dotWidth(3), blockHeight(4)+axleHeight(), LEGO_AXLE_LEFT, 0))
+    truck.push(createConnectorAt(0, dotWidth(7), blockHeight(4)+axleHeight(), LEGO_AXLE_LEFT, 0))
+
+    truck.push(createConnectorAt(0, -dotWidth(3), dotWidth(10)+blockHeight(4)+axleHeight(), LEGO_AXLE_LEFT, 0))
+    truck.push(createConnectorAt(0, dotWidth(7), dotWidth(10)+blockHeight(4)+axleHeight(), LEGO_AXLE_LEFT, 0))
+
+    truck.push(createPlateAt(-dotWidth(1), -dotWidth(2), blockHeight(5), 6,1,LEGO_BLACK, true))
+    truck.push(createPlateAt(-dotWidth(1), dotWidth(7), blockHeight(5), 6,1,LEGO_BLACK, true))
+
+    truck.push(createPlateAt(-dotWidth(1), -dotWidth(2), blockHeight(5)+plateHeight(1), 4,1,LEGO_BLACK, true))
+    truck.push(createPlateAt(-dotWidth(1), dotWidth(7), blockHeight(5)+plateHeight(1), 4,1,LEGO_BLACK, true))
+
+    truck.push(createBeamAt(-dotWidth(1), -dotWidth(2), blockHeight(5)+plateHeight(2), 4,1,LEGO_BLACK, true))
+    truck.push(createBeamAt(-dotWidth(1), dotWidth(7), blockHeight(5)+plateHeight(2), 4,1,LEGO_BLACK, true))
+
+    truck.push(createConnectorAt(0, -dotWidth(3), dotWidth(2)+blockHeight(4)+axleHeight(), LEGO_AXLE_LEFT, 0))
+    truck.push(createConnectorAt(0, dotWidth(7), dotWidth(2)+blockHeight(4)+axleHeight(), LEGO_AXLE_LEFT, 0))
+
+    truck.push(createConnectorAt(0, -dotWidth(3), dotWidth()+blockHeight(4)+axleHeight(), LEGO_AXLE_LEFT, 0))
+    truck.push(createConnectorAt(0, dotWidth(7), dotWidth(4)+blockHeight(4)+axleHeight(), LEGO_AXLE_LEFT, 0))
+
+    // createBeamAt(-dotWidth(1),-dotWidth(2),dotWidth(10)+blockHeight(4), 12,1,LEGO_BLACK)
+    // createBeamAt(-dotWidth(1),dotWidth(7),dotWidth(10)+blockHeight(4), 12,1,LEGO_BLACK)
+
+    // truck.push(createBeamAt(-dotWidth(1), -dotWidth(2), blockHeight(10)+plateHeight(2), 4,1,LEGO_BLACK, true))
+    // truck.push(createBeamAt(-dotWidth(1), dotWidth(7), blockHeight(10)+plateHeight(2), 4,1,LEGO_BLACK, true))
+
+    // truck.push(createPlateAt(-dotWidth(1), -dotWidth(2), blockHeight(10)+plateHeight(1), 4,1,LEGO_BLACK, true))
+    // truck.push(createPlateAt(-dotWidth(1), dotWidth(7), blockHeight(10)+plateHeight(1), 4,1,LEGO_BLACK, true))
+    // truck.push(createPlateAt(-dotWidth(1), -dotWidth(2), blockHeight(10)+plateHeight(2), 4,1,LEGO_BLACK, true))
+    // truck.push(createPlateAt(-dotWidth(1), dotWidth(7), blockHeight(10)+plateHeight(2), 4,1,LEGO_BLACK, true))
+    // truck.push(createPlateAt(-dotWidth(1), -dotWidth(2), blockHeight(9), 4,1,LEGO_BLACK, true))
+    // truck.push(createPlateAt(-dotWidth(1), dotWidth(7), blockHeight(9), 4,1,LEGO_BLACK, true))
+
+    return truck
 }
-createTank()
+truck = createTank()
 
 lego_cleanup()
