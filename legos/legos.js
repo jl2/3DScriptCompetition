@@ -481,9 +481,6 @@ function createBlockAt(x,y,z,width, height, color, fancy) {
 
 
 function createBeamAt(x,y,z,width, height, color) {
-    // if (((width!=1 && height<2)) || ((height != 1) && width<2)) {
-    //     return
-    // }
     // Check the cache
     var descString = "" + width + "x" + height
     if (brickCache['techbeams'][descString]) {
@@ -706,14 +703,6 @@ function createCrownGearAt(x,y,z, normal,arot) {
     return gear
 }
 
-// function createBigGearAt(direction, x,y,z) {
-//     var gear = CGM.createCylinder(cp(0,0,0), up, dotWidth(1)*0.75, axleHeight())
-//     gear = CGM.translate(gear, x,y,z)
-//     allPieces.push(gear)
-//     return gear
-// }
-
-
 function createSmallTireAt(x,y,z, normal, arot) {
     var tire
     var rim
@@ -746,26 +735,6 @@ function createSmallTireAt(x,y,z, normal, arot) {
     var tmp = rotateToDirection([rim, tire], normal, arot)
     rim = tmp[0]
     tire = tmp[1]
-
-    // if (normal == LEGO_AXLE_UP) {
-    //     rim = CGM.rotate(rim, cp(0,0,0), cv(1,0,0), -Math.PI/2)
-    //     tire = CGM.rotate(tire, cp(0,0,0), cv(1,0,0), -Math.PI/2)
-    // } else if (normal == -LEGO_AXLE_UP) {
-    //     rim = CGM.rotate(rim, cp(0,0,0), cv(1,0,0), Math.PI/2)
-    //     tire = CGM.rotate(tire, cp(0,0,0), cv(1,0,0), Math.PI/2)
-    // } else if (normal == LEGO_AXLE_LEFT) {
-    //     
-    // } else if (normal == -LEGO_AXLE_LEFT) {
-    //     rim = CGM.rotate(rim, cp(0,0,0), cv(0,0,1), -Math.PI)
-    //     tire = CGM.rotate(tire, cp(0,0,0), cv(0,0,1), -Math.PI)
-    // } else if (normal == LEGO_AXLE_FRONT) {
-    //     rim = CGM.rotate(rim, cp(0,0,0), cv(0,0,1), Math.PI/2)
-    //     tire = CGM.rotate(tire, cp(0,0,0), cv(0,0,1), Math.PI/2)
-        
-    // } else if (normal == -LEGO_AXLE_FRONT) {
-    //     rim = CGM.rotate(rim, cp(0,0,0), cv(0,0,1), -Math.PI/2)
-    //     tire = CGM.rotate(tire, cp(0,0,0), cv(0,0,1), -Math.PI/2)
-    // }
 
     rim = CGM.translate(CGM.Property.setRGBA(rim, 255,255,255,255), x,y,z)
     
@@ -817,26 +786,6 @@ function createBigTireAt(x,y,z, normal, arot) {
     var tmp = rotateToDirection([rim, tire], normal, arot)
     rim = tmp[0]
     tire = tmp[1]
-
-    // if (normal == LEGO_AXLE_UP) {
-    //     rim = CGM.rotate(rim, cp(0,0,0), cv(1,0,0), -Math.PI/2)
-    //     tire = CGM.rotate(tire, cp(0,0,0), cv(1,0,0), -Math.PI/2)
-    // } else if (normal == -LEGO_AXLE_UP) {
-    //     rim = CGM.rotate(rim, cp(0,0,0), cv(1,0,0), Math.PI/2)
-    //     tire = CGM.rotate(tire, cp(0,0,0), cv(1,0,0), Math.PI/2)
-    // } else if (normal == LEGO_AXLE_LEFT) {
-    //     
-    // } else if (normal == -LEGO_AXLE_LEFT) {
-    //     rim = CGM.rotate(rim, cp(0,0,0), cv(0,0,1), -Math.PI)
-    //     tire = CGM.rotate(tire, cp(0,0,0), cv(0,0,1), -Math.PI)
-    // } else if (normal == LEGO_AXLE_FRONT) {
-    //     rim = CGM.rotate(rim, cp(0,0,0), cv(0,0,1), Math.PI/2)
-    //     tire = CGM.rotate(tire, cp(0,0,0), cv(0,0,1), Math.PI/2)
-        
-    // } else if (normal == -LEGO_AXLE_FRONT) {
-    //     rim = CGM.rotate(rim, cp(0,0,0), cv(0,0,1), -Math.PI/2)
-    //     tire = CGM.rotate(tire, cp(0,0,0), cv(0,0,1), -Math.PI/2)
-    // }
 
     rim = CGM.translate(CGM.Property.setRGBA(rim, 255,255,255,255), x,y,z)
     
@@ -980,7 +929,6 @@ function createStopperAt(x,y,z, direction,arot) {
     } else {
         var rad = 4.8/2
         var thirdDiam = 4.8/5
-        // 3.73352380504785 3.733523804282091
         off = 3.73352380504785
         stopper = CGM.createCylinder(cp(0,0,0), left, dotWidth(1), rad*1.2)
         stopper = CGM.unite(stopper, CGM.createCylinder(cp(0,0,0), left, 0.8, dotWidth(1)*0.45))
@@ -1143,36 +1091,9 @@ function angledGears() {
 
     a3 = createAxleAt(dotWidth(5),axleOffset() + dotWidth(3),axleHeight(), 4, LEGO_AXLE_FRONT, Math.PI/8)
     g3 = createCrownGearAt(dotWidth(4), axleOffset()+ dotWidth(3), axleHeight(), -LEGO_AXLE_FRONT, -Math.PI/8)
-    // a1 = createAxleAt(axleOffset() + dotWidth(0),dotWidth(-1),axleHeight(), 4, LEGO_AXLE_LEFT, 0)
-    // a2 = createAxleAt(axleOffset() + dotWidth(1),dotWidth(-1),axleHeight(), 4, LEGO_AXLE_LEFT, Math.PI/8)
-    // a3 = createAxleAt(axleOffset() + dotWidth(2),dotWidth(-1),axleHeight(), 4, LEGO_AXLE_LEFT, 0)
-    // a4 = createAxleAt(axleOffset() + dotWidth(3),dotWidth(-1),axleHeight(), 4, LEGO_AXLE_LEFT, Math.PI/8)
-    // g1 = createSmallGearAt(axleOffset() + dotWidth(0),dotWidth(1),axleHeight(), LEGO_AXLE_LEFT, 0)
-    // g2 = createSmallGearAt(axleOffset() + dotWidth(1),dotWidth(1),axleHeight(), LEGO_AXLE_LEFT, Math.PI/8)
-    // g3 = createSmallGearAt(axleOffset() + dotWidth(2),dotWidth(1),axleHeight(), LEGO_AXLE_LEFT, 0)
-    // g4 = createSmallGearAt(axleOffset() + dotWidth(3),dotWidth(1),axleHeight(), LEGO_AXLE_LEFT, Math.PI/8)
-
 
 }
 // angledGears()
-// g1 = createSmallGearAt(axleOffset(),dotWidth(1),axleHeight(), LEGO_AXLE_LEFT, 0)
-
-
-// g2 = createSmallGearAt(axleOffset() + dotWidth(1),dotWidth(1),axleHeight(), LEGO_AXLE_LEFT, Math.PI/4)
-// g4 = createSmallGearAt(axleOffset() + dotWidth(3),dotWidth(1),axleHeight(), LEGO_AXLE_LEFT, Math.PI/8)
-
-// createTruckBase()
-// createSmallTireAt(0,0,blockHeight(4), LEGO_AXLE_UP)
-// createSmallTireAt(0,dotWidth(4),0, LEGO_AXLE_LEFT)
-// t1 = createSmallTireAt(7.9,dotWidth(-1),axleHeight())
-// t2 = createSmallTireAt(7.9, dotWidth(4),axleHeight())
-// allPieces.push(createBeamAt(12,1,LEGO_YELLOW, 0,0,blockHeight(1)))
-// allPieces.push(createBeamAt(10,1,LEGO_YELLOW, 0,0,blockHeight(2)))
-// allPieces.push(createBeamAt(8,1,LEGO_YELLOW, 0,0,blockHeight(3)))
-// allPieces.push(createBeamAt(6,1,LEGO_YELLOW, 0,0,blockHeight(4)))
-// allPieces.push(createBeamAt(4,1,LEGO_YELLOW, 0,0,blockHeight(5)))
-// allPieces.push(createBeamAt(2,1,LEGO_YELLOW, 0,0,blockHeight(6)))
-// allPieces.push(createBeamAt(2,1,LEGO_YELLOW, 0, dotWidth(18), 0))
 function usePulleys() {
     beam = createBeamAt(0,0,0, 8,1,LEGO_YELLOW)
     a1 = createAxleAt(axleOffset() + dotWidth(6),dotWidth(-1),axleHeight(), 4, LEGO_AXLE_LEFT, -Math.PI/8)
@@ -1313,38 +1234,26 @@ function createTank() {
     createBeamAt(0,dotWidth(1),blockHeight(2), 1,4,LEGO_YELLOW)
     createBeamAt(dotWidth(21),dotWidth(1),blockHeight(2), 1,4,LEGO_YELLOW)
 
+    createBeamAt(0,dotWidth(1),0, 1,4,LEGO_YELLOW)
+    createBeamAt(dotWidth(21),dotWidth(1),0, 1,4,LEGO_YELLOW)
+
+    createPlateAt(0, 0, -plateHeight(1), 1,6,LEGO_RED, true)
+    createPlateAt(dotWidth(21), 0, -plateHeight(1), 1,6,LEGO_RED, true)
+
+    createBeamAt(0,-dotWidth(2),0, 1,10,LEGO_BLACK)
+    createBeamAt(dotWidth(21),-dotWidth(2),0, 1,10,LEGO_BLACK)
+
+    createBeamAt(0,-dotWidth(2),blockHeight(3), 1,10,LEGO_BLACK)
+    createBeamAt(dotWidth(13),-dotWidth(2),blockHeight(3), 1,10,LEGO_BLACK)
+    createBeamAt(dotWidth(8),-dotWidth(2),blockHeight(3), 1,10,LEGO_BLACK)
+    createBeamAt(dotWidth(5),-dotWidth(2),blockHeight(3), 1,10,LEGO_BLACK)
+
+    createBeamAt(dotWidth(21),0,blockHeight(3), 1,6,LEGO_BLACK)
+    createBeamAt(dotWidth(16),0,blockHeight(3), 1,6,LEGO_BLACK)
+    
+    createBeamAt(-dotWidth(1),-dotWidth(2),blockHeight(4), 16,1,LEGO_BLACK)
+    createBeamAt(-dotWidth(1),dotWidth(7),blockHeight(4), 16,1,LEGO_BLACK)
 }
 createTank()
-    // createBeamAt(16,1,LEGO_YELLOW, dotWidth(14),dotWidth(1),0)
-    // createBeamAt(16,1,LEGO_YELLOW, dotWidth(14),dotWidth(6),0)
-
-    // createTechPlateAt(2,8, LEGO_RED, 0,0,blockHeight(1),true)
-    // createTechPlateAt(2,8, LEGO_RED, dotWidth(6),0,blockHeight(1),true)
-    // createTechPlateAt(2,8, LEGO_RED, dotWidth(14),0,blockHeight(1),true)
-
-    // createTechPlateAt(2,8, LEGO_RED, 0,0,plateHeight(-1),true)
-    // createTechPlateAt(2,8, LEGO_RED, dotWidth(6),0,plateHeight(-1),true)
-    // createTechPlateAt(2,8, LEGO_RED, dotWidth(14),0,plateHeight(-1),true)
-
-    // createTechPlateAt(2,6, LEGO_RED, dotWidth(26),dotWidth(1),plateHeight(-1),true)
-    // createTechPlateAt(2,6, LEGO_RED, dotWidth(26),dotWidth(1),blockHeight(1),true)
-
-    // createBeamAt(8,1,LEGO_YELLOW, 0,0,blockHeight(1)+plateHeight(1))
-    // createBeamAt(8,1,LEGO_YELLOW, 0,dotWidth(7),blockHeight(1)+plateHeight(1))
-
-    // createAxleAt(axleOffset(),dotWidth(-2),axleHeight(),8, LEGO_AXLE_LEFT)
-    // createAxleAt(axleOffset() + dotWidth(7),dotWidth(-2),axleHeight(), 8, LEGO_AXLE_LEFT)
-    // createAxleAt(axleOffset() + dotWidth(26),dotWidth(-2),axleHeight(), 8, LEGO_AXLE_LEFT)
-
-    // t1 = createBigTireAt(axleOffset() ,0,axleHeight(), -LEGO_AXLE_LEFT,0)
-    // t2 = createBigTireAt(axleOffset(),dotWidth(4),axleHeight(), LEGO_AXLE_LEFT,0)
-
-    // t3 = createBigTireAt(axleOffset() + dotWidth(7),0,axleHeight(), -LEGO_AXLE_LEFT,0)
-    // t4 = createBigTireAt(axleOffset() + dotWidth(7),dotWidth(4),axleHeight(), LEGO_AXLE_LEFT,0)
-
-    // t5 = createBigTireAt(axleOffset() + dotWidth(15),dotWidth(0),axleHeight(), -LEGO_AXLE_LEFT,0)
-    // t6 = createBigTireAt(axleOffset() + dotWidth(15),dotWidth(4),axleHeight(), LEGO_AXLE_LEFT,0)
-
 
 lego_cleanup()
-// ཧྐྵྨླྺྼྻྂ
