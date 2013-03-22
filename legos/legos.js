@@ -1317,17 +1317,30 @@ function createTank() {
     truck.push(createConnectorAt(0, -dotWidth(3), dotWidth(2)+blockHeight(4)+axleHeight(), LEGO_AXLE_LEFT, 0))
     truck.push(createConnectorAt(0, dotWidth(7), dotWidth(2)+blockHeight(4)+axleHeight(), LEGO_AXLE_LEFT, 0))
 
-    truck.push(createConnectorAt(0, -dotWidth(3), dotWidth()+blockHeight(4)+axleHeight(), LEGO_AXLE_LEFT, 0))
-    truck.push(createConnectorAt(0, dotWidth(7), dotWidth(4)+blockHeight(4)+axleHeight(), LEGO_AXLE_LEFT, 0))
+    truck.push(createConnectorAt(0, -dotWidth(3), dotWidth(8)+blockHeight(4)+axleHeight(), LEGO_AXLE_LEFT, 0))
+    truck.push(createConnectorAt(0, dotWidth(7), dotWidth(8)+blockHeight(4)+axleHeight(), LEGO_AXLE_LEFT, 0))
 
-    // createBeamAt(-dotWidth(1),-dotWidth(2),dotWidth(10)+blockHeight(4), 12,1,LEGO_BLACK)
-    // createBeamAt(-dotWidth(1),dotWidth(7),dotWidth(10)+blockHeight(4), 12,1,LEGO_BLACK)
+    createBeamAt(-dotWidth(1),-dotWidth(2),dotWidth(10)+blockHeight(4), 12,1,LEGO_BLACK)
+    createBeamAt(-dotWidth(1),dotWidth(7),dotWidth(10)+blockHeight(4), 12,1,LEGO_BLACK)
 
-    // truck.push(createBeamAt(-dotWidth(1), -dotWidth(2), blockHeight(10)+plateHeight(2), 4,1,LEGO_BLACK, true))
-    // truck.push(createBeamAt(-dotWidth(1), dotWidth(7), blockHeight(10)+plateHeight(2), 4,1,LEGO_BLACK, true))
+    truck.push(createBeamAt(-dotWidth(1), -dotWidth(2), blockHeight(10)+plateHeight(2), 4,1,LEGO_BLACK, true))
+    truck.push(createBeamAt(-dotWidth(1), dotWidth(7), blockHeight(10)+plateHeight(2), 4,1,LEGO_BLACK, true))
 
-    // truck.push(createPlateAt(-dotWidth(1), -dotWidth(2), blockHeight(10)+plateHeight(1), 4,1,LEGO_BLACK, true))
-    // truck.push(createPlateAt(-dotWidth(1), dotWidth(7), blockHeight(10)+plateHeight(1), 4,1,LEGO_BLACK, true))
+    truck.push(createPlateAt(-dotWidth(1), -dotWidth(2), blockHeight(12)-plateHeight(1), 4,1,LEGO_BLACK, true))
+    truck.push(createPlateAt(-dotWidth(1), dotWidth(7), blockHeight(12)-plateHeight(1), 4,1,LEGO_BLACK, true))
+
+    truck.push(createPlateAt(-dotWidth(1), -dotWidth(2), blockHeight(12), 6,1,LEGO_BLACK, true))
+    truck.push(createPlateAt(-dotWidth(1), dotWidth(7), blockHeight(12), 6,1,LEGO_BLACK, true))
+
+
+    tb = createBeamAt(dotWidth(8),-dotWidth(3),blockHeight(12), 12,1,LEGO_BLACK)
+    tb = CGM.rotate(tb, cp(dotWidth(8)+axleOffset(), -dotWidth(3), blockHeight(12)+axleHeight()), left, Math.PI/2)
+    truck.push(tb)
+
+    tb = createBeamAt(-dotWidth(1),dotWidth(8),blockHeight(4), 12,1,LEGO_BLACK)
+    tb = CGM.rotate(tb, cp(-dotWidth(1)+axleOffset(), dotWidth(8), blockHeight(4)+axleHeight()), left, -Math.PI/2)
+    truck.push(tb)
+
     // truck.push(createPlateAt(-dotWidth(1), -dotWidth(2), blockHeight(10)+plateHeight(2), 4,1,LEGO_BLACK, true))
     // truck.push(createPlateAt(-dotWidth(1), dotWidth(7), blockHeight(10)+plateHeight(2), 4,1,LEGO_BLACK, true))
     // truck.push(createPlateAt(-dotWidth(1), -dotWidth(2), blockHeight(9), 4,1,LEGO_BLACK, true))
